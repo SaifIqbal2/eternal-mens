@@ -4,13 +4,11 @@ import { getFeaturedPieces, getBestsellers, getNewArrivals, subscribeNewsletter 
 import { useCartStore } from '../store/useCartStore'
 
 const NAV_CATEGORIES = [
-  { name: 'Wallets', slug: 'wallets', image: '/assets/images/categories/wallets.jpg', link: '/collection?section=accessories&category=wallets' },
-  { name: 'Belts', slug: 'belts', image: '/assets/images/categories/belts.jpg', link: '/collection?section=accessories&category=belts' },
+  { name: 'Watches', slug: 'watches', image: '/assets/images/categories/watches.jpg', link: '/collection?section=watches' },
   { name: 'Sunglasses', slug: 'sunglasses', image: '/assets/images/categories/sunglasses.jpg', link: '/collection?section=accessories&category=sunglasses' },
   { name: 'Bracelets', slug: 'bracelets', image: '/assets/images/categories/bracelets.jpg', link: '/collection?section=accessories&category=bracelets' },
   { name: 'Rings', slug: 'rings', image: '/assets/images/categories/rings.jpg', link: '/collection?section=accessories&category=rings' },
   { name: 'Chains', slug: 'chains', image: '/assets/images/categories/chains.jpg', link: '/collection?section=accessories&category=chains' },
-  { name: 'Watches', slug: 'watches', image: '/assets/images/categories/watches.jpg', link: '/collection?section=watches' },
 ]
 
 export default function Home() {
@@ -165,15 +163,16 @@ export default function Home() {
             </div>
 
             <div className="featured-editorial" id="featuredCarousel">
-              <div className="featured-editorial-image">
+              <div className="featured-editorial-image" style={{ position: 'relative', minHeight: '480px' }}>
                 {featuredPieces.map((p, i) => {
                   const img = p.images?.[0]?.url || '/assets/images/1.jpg'
                   return (
                     <div
                       key={p.id}
                       className={`featured-slide-image${i === featuredIndex ? ' is-active' : ''}`}
+                      style={{ position: 'absolute', inset: 0 }}
                     >
-                      <img src={img} alt={p.name} />
+                      <img src={img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
                     </div>
                   )
                 })}
@@ -365,8 +364,20 @@ export default function Home() {
       {/* SECTION 5: BRAND STATEMENT (UPRIGHT IMAGE) */}
       <section className="section section-dark reveal in-view">
         <div className="container brand-statement">
-          <div className="brand-statement-image">
-            <img src="/assets/images/brandS.jpeg" alt="Model wearing an Eternal Mens watch" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div className="brand-statement-image" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/5', width: '100%' }}>
+            <img
+              src="/assets/images/brandS.jpeg"
+              alt="Model wearing an Eternal Mens watch"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center center',
+                display: 'block',
+              }}
+            />
           </div>
           <div>
             <p className="section-eyebrow">Our Philosophy</p>
