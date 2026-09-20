@@ -364,15 +364,14 @@ export default function Home() {
       {/* SECTION 5: BRAND STATEMENT (UPRIGHT IMAGE) */}
       <section className="section section-dark reveal in-view">
         <div className="container brand-statement">
-          <div className="brand-statement-image" style={{ position: 'relative', overflow: 'hidden', aspectRatio: '4/5', width: '100%' }}>
+          <div className="brand-statement-image" style={{ overflow: 'hidden', minHeight: '420px' }}>
             <img
               src="/assets/images/brandS.jpeg"
               alt="Model wearing an Eternal Mens watch"
               style={{
-                position: 'absolute',
-                inset: 0,
                 width: '100%',
                 height: '100%',
+                minHeight: '420px',
                 objectFit: 'cover',
                 objectPosition: 'center center',
                 display: 'block',
