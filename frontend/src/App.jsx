@@ -6,6 +6,7 @@ import Shop from './pages/Shop'
 import ProductDetails from './pages/ProductDetails'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
+import OrderConfirmation from './pages/OrderConfirmation'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Faq from './pages/Faq'
@@ -63,6 +64,7 @@ function App() {
             {/* Cart & Checkout */}
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
+            <Route path="order-confirmation" element={<OrderConfirmation />} />
             {/* Info pages */}
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
