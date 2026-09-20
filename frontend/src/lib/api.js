@@ -10,7 +10,8 @@ export async function getProducts({ section, categorySlug, search, sort, limit, 
       id, name, slug, sku, brand, price, compare_at_price,
       stock, low_stock_threshold, is_featured, is_bestseller, status,
       ${categoryRelation}(id, name, slug, section),
-      images:product_images(url, alt_text, sort_order)
+      images:product_images(url, alt_text, sort_order),
+      variants:product_variants(id, name, option_type, sku, price_override, stock, image, is_active)
     `)
     .eq('status', 'ACTIVE')
 

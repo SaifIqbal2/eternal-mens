@@ -1,10 +1,41 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { getProducts, getCategories } from '../lib/api'
+import { useCartStore } from '../store/useCartStore'
 
 function ProductCard({ p }) {
   const img = p.images?.[0]?.url || '/assets/images/1.jpg'
   const inStock = p.stock > 0
+  
+  const addToCart = useCartStore((s) => s.addToCart)
+  const [showVariants, setShowVariants] = useState(false)
+  const [selectedVariant, setSelectedVariant] = useState('')
+  const [added, setAdded] = useState(false)
+
+  const hasVariants = p.variants && p.variants.length > 0;
+  
+  const handleQuickAdd = (e) => {
+    e.preventDefault();
+    if (hasVariants) {
+      setShowVariants(true)
+    } else {
+      addToCart(p, 1)
+      setAdded(true)
+      setTimeout(() => setAdded(false), 2000)
+    }
+  }
+
+  const handleVariantAdd = (e) => {
+    e.preventDefault()
+    if (!selectedVariant) return
+    const variant = p.variants.find(v => String(v.id) === selectedVariant)
+    if (variant) {
+      addToCart(p, 1, variant)
+      setAdded(true)
+      setTimeout(() => { setAdded(false); setShowVariants(false); setSelectedVariant(''); }, 1500)
+    }
+  }
+
   return (
     <div className="product-card">
       <div className="product-card-image">
@@ -16,8 +47,32 @@ function ProductCard({ p }) {
         {p.stock > 0 && p.stock <= p.low_stock_threshold && (
           <span className="badge-stock">Only {p.stock} left</span>
         )}
-        {inStock && (
-          <Link to={`/product/${p.slug}`} className="quick-add">View Product</Link>
+        
+        {inStock && !showVariants && (
+          <button type="button" className="quick-add" onClick={handleQuickAdd}>
+             {added ? 'Added!' : 'QUICK ADD'}
+          </button>
+        )}
+        
+        {inStock && showVariants && (
+          <div className="quick-add" style={{ padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(255,255,255,0.98)', color: '#000', cursor: 'default' }}>
+             <select 
+               style={{ padding: '4px', fontSize: '0.8rem', border: '1px solid #ccc', background: '#fff', color: '#000', outline: 'none' }} 
+               value={selectedVariant} 
+               onChange={e => setSelectedVariant(e.target.value)}
+             >
+                <option value="">Select Option</option>
+                {p.variants.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+             </select>
+             <div style={{ display: 'flex', gap: '4px' }}>
+                <button type="button" onClick={handleVariantAdd} style={{ flex: 1, background: '#111', color: '#fff', border: 'none', padding: '6px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>
+                   {added ? 'ADDED!' : 'ADD'}
+                </button>
+                <button type="button" onClick={(e) => { e.preventDefault(); setShowVariants(false); }} style={{ flex: 1, background: '#eee', color: '#111', border: 'none', padding: '6px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 600 }}>
+                   CANCEL
+                </button>
+             </div>
+          </div>
         )}
       </div>
       <div className="product-card-info">
