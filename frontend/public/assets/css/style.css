@@ -337,8 +337,8 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 767px) {
   .hero {
-    height: 78svh;
-    min-height: 620px;
+    height: 92svh;
+    min-height: 480px;
     align-items: flex-end;
   }
 
@@ -352,7 +352,7 @@ button { font-family: inherit; cursor: pointer; }
   }
 
   .hero-content {
-    padding-bottom: 5.5rem;
+    padding-bottom: 3.5rem;
     max-width: 100%;
   }
 
@@ -400,11 +400,11 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 420px) {
   .hero {
-    min-height: 580px;
+    min-height: 450px;
   }
 
   .hero-content {
-    padding-bottom: 5rem;
+    padding-bottom: 3rem;
   }
 
   .hero h1 {
