@@ -1,51 +1,41 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { getFeaturedProducts, getCategories, subscribeNewsletter } from '../lib/api'
+import { getFeaturedPieces, getBestsellers, getNewArrivals, subscribeNewsletter } from '../lib/api'
+import { useCartStore } from '../store/useCartStore'
 
-function ProductCard({ p }) {
-  const img = p.images?.[0]?.url || '/assets/images/1.jpg'
-  return (
-    <div className="product-card">
-      <div className="product-card-image">
-        <Link to={`/product/${p.slug}`} className="product-card-image-link">
-          <img src={img} alt={p.name} loading="lazy" />
-        </Link>
-        <Link to={`/product/${p.slug}`} className="quick-add">View Product</Link>
-      </div>
-      <div className="product-card-info">
-        <div>
-          <Link to={`/product/${p.slug}`}><h3>{p.name}</h3></Link>
-          {p.stock > 0 && p.stock <= p.low_stock_threshold && (
-            <p className="low-stock-label">Only {p.stock} left</p>
-          )}
-        </div>
-        <div className="price">
-          {p.compare_at_price && (
-            <span className="price-compare">Rs {Number(p.compare_at_price).toLocaleString()}</span>
-          )}
-          Rs {Number(p.price).toLocaleString()}
-        </div>
-      </div>
-    </div>
-  )
-}
+const NAV_CATEGORIES = [
+  { name: 'Wallets', slug: 'wallets', image: '/assets/images/categories/wallets.jpg', link: '/collection?section=accessories&category=wallets' },
+  { name: 'Belts', slug: 'belts', image: '/assets/images/categories/belts.jpg', link: '/collection?section=accessories&category=belts' },
+  { name: 'Sunglasses', slug: 'sunglasses', image: '/assets/images/categories/sunglasses.jpg', link: '/collection?section=accessories&category=sunglasses' },
+  { name: 'Bracelets', slug: 'bracelets', image: '/assets/images/categories/bracelets.jpg', link: '/collection?section=accessories&category=bracelets' },
+  { name: 'Rings', slug: 'rings', image: '/assets/images/categories/rings.jpg', link: '/collection?section=accessories&category=rings' },
+  { name: 'Chains', slug: 'chains', image: '/assets/images/categories/chains.jpg', link: '/collection?section=accessories&category=chains' },
+  { name: 'Watches', slug: 'watches', image: '/assets/images/categories/watches.jpg', link: '/collection?section=watches' },
+]
 
 export default function Home() {
-  const [featured, setFeatured] = useState([])
-  const [accessoryCategories, setAccessoryCategories] = useState([])
+  const addToCart = useCartStore((s) => s.addToCart)
+
+  const [featuredPieces, setFeaturedPieces] = useState([])
+  const [bestsellers, setBestsellers] = useState([])
+  const [newArrivals, setNewArrivals] = useState([])
   const [loading, setLoading] = useState(true)
+
+  const [featuredIndex, setFeaturedIndex] = useState(0)
+  const [arrivalsIndex, setArrivalsIndex] = useState(0)
+  const [addedId, setAddedId] = useState(null)
+
   const [email, setEmail] = useState('')
   const [subMsg, setSubMsg] = useState('')
 
-  useEffect(() => {
-    getFeaturedProducts(8, 'watches')
-      .then(setFeatured)
-      .catch(console.error)
-      .finally(() => setLoading(false))
+  const arrivalsTrackRef = useRef(null)
 
-    getCategories('accessories')
-      .then(setAccessoryCategories)
-      .catch(console.error)
+  useEffect(() => {
+    Promise.all([
+      getFeaturedPieces(6).then(setFeaturedPieces).catch(console.error),
+      getBestsellers(6).then(setBestsellers).catch(console.error),
+      getNewArrivals(8).then(setNewArrivals).catch(console.error),
+    ]).finally(() => setLoading(false))
   }, [])
 
   const handleSubscribe = async (e) => {
@@ -59,9 +49,52 @@ export default function Home() {
     }
   }
 
+  const handleAddBestseller = (product) => {
+    addToCart(product, 1)
+    setAddedId(product.id)
+    setTimeout(() => setAddedId(null), 1500)
+  }
+
+  // Featured Carousel Navigation
+  const prevFeatured = () => {
+    if (featuredPieces.length === 0) return
+    setFeaturedIndex((i) => (i - 1 + featuredPieces.length) % featuredPieces.length)
+  }
+
+  const nextFeatured = () => {
+    if (featuredPieces.length === 0) return
+    setFeaturedIndex((i) => (i + 1) % featuredPieces.length)
+  }
+
+  // Arrivals Carousel Navigation
+  const prevArrivals = () => {
+    if (newArrivals.length === 0) return
+    const nextIdx = Math.max(0, arrivalsIndex - 1)
+    setArrivalsIndex(nextIdx)
+    scrollArrivals(nextIdx)
+  }
+
+  const nextArrivals = () => {
+    if (newArrivals.length === 0) return
+    const maxIdx = Math.max(0, newArrivals.length - 1)
+    const nextIdx = Math.min(maxIdx, arrivalsIndex + 1)
+    setArrivalsIndex(nextIdx)
+    scrollArrivals(nextIdx)
+  }
+
+  const scrollArrivals = (idx) => {
+    if (!arrivalsTrackRef.current) return
+    const items = arrivalsTrackRef.current.children
+    if (items && items[idx]) {
+      items[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+    }
+  }
+
+  const activeFeatured = featuredPieces[featuredIndex]
+
   return (
     <>
-      {/* HERO */}
+      {/* HERO SECTION */}
       <section className="hero">
         <img src="/assets/images/hero.jpeg" alt="Eternal Mens watch" className="hero-bg" />
         <div className="hero-overlay"></div>
@@ -85,29 +118,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORY ORBITS */}
-      <section className="section category-orbits-section reveal">
+      {/* SECTION 1: CATEGORY ORBITS (FIND YOUR PIECE) */}
+      <section className="section category-orbits-section reveal in-view">
         <div className="container">
           <p className="section-eyebrow text-center">Shop by Category</p>
           <h2 className="section-heading text-center">Find Your Piece</h2>
           <div className="category-orbits">
-            <Link to="/collection?section=watches" className="category-orb">
-              <span className="category-orb-visual" style={{ position: 'relative', display: 'block', width: '180px', height: '180px' }}>
-                <svg className="orb-arc orb-arc-1" viewBox="0 0 160 160" width="180" height="180" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', fill: 'none' }}>
-                  <path d="M 19.6 106.5 A 66 66 0 0 1 106.5 19.6" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                <svg className="orb-arc orb-arc-2" viewBox="0 0 160 160" width="160" height="160" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', fill: 'none' }}>
-                  <path d="M 140.4 53.5 A 66 66 0 0 1 53.5 140.4" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                <span className="category-orb-image" style={{ position: 'absolute', inset: '30px', borderRadius: '50%', overflow: 'hidden', display: 'block', background: '#ddd9d1' }}>
-                  <img src="/assets/images/categories/watches.jpg" alt="Watches" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                </span>
-              </span>
-              <span className="category-orb-label">Watches</span>
-            </Link>
-
-            {accessoryCategories.map(cat => (
-              <Link key={cat.id} to={`/collection?section=accessories&category=${cat.slug}`} className="category-orb">
+            {NAV_CATEGORIES.map((cat) => (
+              <Link key={cat.slug} to={cat.link} className="category-orb">
                 <span className="category-orb-visual" style={{ position: 'relative', display: 'block', width: '180px', height: '180px' }}>
                   <svg className="orb-arc orb-arc-1" viewBox="0 0 160 160" width="180" height="180" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', fill: 'none' }}>
                     <path d="M 19.6 106.5 A 66 66 0 0 1 106.5 19.6" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
@@ -116,7 +134,13 @@ export default function Home() {
                     <path d="M 140.4 53.5 A 66 66 0 0 1 53.5 140.4" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                   <span className="category-orb-image" style={{ position: 'absolute', inset: '30px', borderRadius: '50%', overflow: 'hidden', display: 'block', background: '#ddd9d1' }}>
-                    <img src={cat.image || `/assets/images/categories/${cat.slug}.jpg`} alt={cat.name} onError={(e) => { e.currentTarget.src = '/assets/images/bracelets.jpg' }} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      onError={(e) => { e.currentTarget.src = '/assets/images/1.jpg' }}
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
                   </span>
                 </span>
                 <span className="category-orb-label">{cat.name}</span>
@@ -126,11 +150,223 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BRAND STATEMENT */}
-      <section className="section section-dark reveal">
+      {/* SECTION 2: FEATURED EDITORIAL (SELECTED PIECES) */}
+      {featuredPieces.length > 0 && (
+        <section className="section featured-editorial-section reveal in-view">
+          <div className="container">
+            <div className="featured-editorial-heading">
+              <div>
+                <p className="section-eyebrow">Featured</p>
+                <h2 className="section-heading">Selected Pieces</h2>
+              </div>
+              <span className="featured-counter">
+                <strong>{String(featuredIndex + 1).padStart(2, '0')}</strong> / {String(featuredPieces.length).padStart(2, '0')}
+              </span>
+            </div>
+
+            <div className="featured-editorial" id="featuredCarousel">
+              <div className="featured-editorial-image">
+                {featuredPieces.map((p, i) => {
+                  const img = p.images?.[0]?.url || '/assets/images/1.jpg'
+                  return (
+                    <div
+                      key={p.id}
+                      className={`featured-slide-image${i === featuredIndex ? ' is-active' : ''}`}
+                    >
+                      <img src={img} alt={p.name} />
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="featured-editorial-info">
+                {activeFeatured && (
+                  <div className="featured-slide-info is-active">
+                    <p className="featured-piece-number">{String(featuredIndex + 1).padStart(2, '0')}</p>
+                    <h3>{activeFeatured.name}</h3>
+                    <p className="featured-piece-copy">
+                      {activeFeatured.description || 'Precision in every detail. Designed to be worn, noticed, and remembered.'}
+                    </p>
+
+                    <div className="featured-piece-bottom">
+                      <span className="featured-piece-price">Rs {Number(activeFeatured.price).toLocaleString()}</span>
+                      <Link to={`/product/${activeFeatured.slug}`} className="featured-piece-link">
+                        View Piece <span>→</span>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                <div className="featured-navigation">
+                  <button type="button" className="featured-nav-btn" onClick={prevFeatured} aria-label="Previous featured product">
+                    ←
+                  </button>
+                  <span className="featured-nav-line">
+                    <i style={{ width: `${((featuredIndex + 1) / featuredPieces.length) * 100}%` }}></i>
+                  </span>
+                  <button type="button" className="featured-nav-btn" onClick={nextFeatured} aria-label="Next featured product">
+                    →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 3: BEST SELLERS (WHAT EVERYONE'S WEARING) */}
+      {bestsellers.length > 0 && (
+        <section className="section reveal in-view">
+          <div className="container" style={{ maxWidth: '900px' }}>
+            <p className="section-eyebrow">Best Sellers</p>
+            <h2 className="section-heading">What Everyone's Wearing</h2>
+            <div className="bestseller-list">
+              {bestsellers.map((p, i) => {
+                const img = p.images?.[0]?.url || '/assets/images/1.jpg'
+                const isAdded = addedId === p.id
+                return (
+                  <div key={p.id} className="bestseller-row" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.25rem 0', borderBottom: '1px solid #e2ded7' }}>
+                    <span className="bestseller-rank mono" style={{ fontSize: '0.9rem', color: 'var(--graphite-soft)', width: '28px' }}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <Link to={`/product/${p.slug}`} className="bestseller-thumb" style={{ width: '64px', height: '64px', flexShrink: 0, overflow: 'hidden', background: '#ece8e1' }}>
+                      <img src={img} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </Link>
+                    <div className="bestseller-info" style={{ flex: 1 }}>
+                      <Link to={`/product/${p.slug}`}>
+                        <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0 }}>{p.name}</h3>
+                      </Link>
+                      {p.stock > 0 && p.stock <= p.low_stock_threshold && (
+                        <p className="low-stock-label" style={{ fontSize: '0.75rem', color: 'var(--brass)', margin: '0.25rem 0 0' }}>
+                          Only {p.stock} left
+                        </p>
+                      )}
+                    </div>
+                    <div className="bestseller-price" style={{ textAlign: 'right' }}>
+                      <span className="mono" style={{ fontSize: '0.95rem', fontWeight: 500, display: 'block' }}>
+                        Rs {Number(p.price).toLocaleString()}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleAddBestseller(p)}
+                      style={{
+                        background: isAdded ? 'var(--brass)' : '#111',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '0.45rem 0.9rem',
+                        fontSize: '0.75rem',
+                        letterSpacing: '0.08em',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        transition: 'background 0.2s',
+                        borderRadius: '0',
+                      }}
+                    >
+                      {isAdded ? 'Added!' : 'ADD'}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 4: NEW ARRIVALS CAROUSEL */}
+      {newArrivals.length > 0 && (
+        <section className="new-arrivals-section reveal in-view">
+          <div className="new-arrivals-bg"></div>
+
+          <div className="new-arrivals-panel">
+            <div className="container">
+              <div className="new-arrivals-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', letterSpacing: '0.04em', textTransform: 'uppercase', margin: 0 }}>
+                  New Arrivals
+                </h2>
+                <Link to="/collection" className="new-arrivals-all" style={{ fontSize: '0.85rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'inherit', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  All Products <span>→</span>
+                </Link>
+              </div>
+
+              <div className="new-arrivals-line" style={{ height: '1px', background: '#dcd8cf', marginBottom: '2rem' }}></div>
+
+              <div className="new-arrivals-carousel" style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  className="new-arrivals-arrow new-arrivals-arrow-left"
+                  onClick={prevArrivals}
+                  aria-label="Previous products"
+                >
+                  ←
+                </button>
+
+                <div
+                  className="new-arrivals-track"
+                  id="arrivalsCarousel"
+                  ref={arrivalsTrackRef}
+                  style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollbarWidth: 'none', paddingBottom: '1rem' }}
+                >
+                  {newArrivals.map((p, i) => {
+                    const img = p.images?.[0]?.url || '/assets/images/1.jpg'
+                    return (
+                      <div
+                        key={p.id}
+                        className="new-arrival-item"
+                        style={{ flex: '0 0 calc(25% - 1.15rem)', minWidth: '220px', scrollSnapAlign: 'start' }}
+                      >
+                        <Link to={`/product/${p.slug}`} className="new-arrival-image" style={{ display: 'block', aspectRatio: '1', overflow: 'hidden', background: '#eee', marginBottom: '1rem' }}>
+                          <img src={img} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </Link>
+
+                        <div className="new-arrival-info">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                            <span className="new-arrival-number mono" style={{ fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>
+                              {String(i + 1).padStart(2, '0')}
+                            </span>
+                            <Link to={`/product/${p.slug}`}>
+                              <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                                {p.name}
+                              </h3>
+                            </Link>
+                          </div>
+
+                          <span className="new-arrival-price mono" style={{ fontSize: '0.85rem', color: 'var(--graphite)' }}>
+                            Rs {Number(p.price).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  className="new-arrivals-arrow new-arrivals-arrow-right"
+                  onClick={nextArrivals}
+                  aria-label="Next products"
+                >
+                  →
+                </button>
+              </div>
+
+              <div className="new-arrivals-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+                <span className="mono">{String(arrivalsIndex + 1).padStart(2, '0')}</span>
+                <span className="new-arrivals-progress" style={{ width: '120px', height: '2px', background: '#dcd8cf', position: 'relative', display: 'inline-block' }}>
+                  <i style={{ position: 'absolute', top: 0, left: 0, height: '100%', background: 'var(--brass)', width: `${((arrivalsIndex + 1) / newArrivals.length) * 100}%` }}></i>
+                </span>
+                <span className="mono">{String(newArrivals.length).padStart(2, '0')}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 5: BRAND STATEMENT (UPRIGHT IMAGE) */}
+      <section className="section section-dark reveal in-view">
         <div className="container brand-statement">
           <div className="brand-statement-image">
-            <img src="/assets/images/brandS.jpeg" alt="Eternal Mens style" />
+            <img src="/assets/images/brandS.jpeg" alt="Model wearing an Eternal Mens watch" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div>
             <p className="section-eyebrow">Our Philosophy</p>
@@ -140,28 +376,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS */}
-      {(loading || featured.length > 0) && (
-        <section className="section reveal">
-          <div className="container">
-            <p className="section-eyebrow">New In</p>
-            <h2 className="section-heading">Latest Arrivals</h2>
-            {loading ? (
-              <p style={{ color: 'var(--graphite-soft)' }}>Loading products...</p>
-            ) : (
-              <div className="product-grid">
-                {featured.map(p => <ProductCard key={p.id} p={p} />)}
-              </div>
-            )}
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <Link to="/collection?section=watches" className="btn btn-outline-dark">View All Watches</Link>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* TRUST GRID */}
-      <section className="section reveal">
+      <section className="section reveal in-view">
         <div className="container">
           <div className="trust-grid">
             <div className="trust-item">
@@ -188,8 +404,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* REVIEWS */}
-      <section className="section reveal">
+      {/* REVIEWS GRID */}
+      <section className="section reveal in-view">
         <div className="container">
           <h2 className="section-heading">In Their Words</h2>
           <div className="review-grid">
@@ -213,7 +429,7 @@ export default function Home() {
       </section>
 
       {/* NEWSLETTER */}
-      <section className="section section-dark reveal">
+      <section className="section section-dark reveal in-view">
         <div className="container newsletter">
           <h2>Join the List</h2>
           <p>New arrivals, early access, and the occasional private discount. No spam.</p>
@@ -222,7 +438,7 @@ export default function Home() {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
             <button type="submit" className="btn btn-light">Subscribe</button>

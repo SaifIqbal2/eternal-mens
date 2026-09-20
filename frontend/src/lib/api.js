@@ -2,7 +2,7 @@ import { supabase } from './supabase'
 
 // ─── PRODUCTS ────────────────────────────────────────────────
 
-export async function getProducts({ section, categorySlug, search, sort, limit } = {}) {
+export async function getProducts({ section, categorySlug, search, sort, limit, minPrice, maxPrice, inStockOnly, isFeatured, isBestseller } = {}) {
   const categoryRelation = (section || categorySlug) ? 'category:categories!inner' : 'category:categories'
   let query = supabase
     .from('products')
@@ -23,11 +23,26 @@ export async function getProducts({ section, categorySlug, search, sort, limit }
   if (search) {
     query = query.ilike('name', `%${search}%`)
   }
+  if (minPrice != null && minPrice !== '') {
+    query = query.gte('price', Number(minPrice))
+  }
+  if (maxPrice != null && maxPrice !== '') {
+    query = query.lte('price', Number(maxPrice))
+  }
+  if (inStockOnly) {
+    query = query.gt('stock', 0)
+  }
+  if (isFeatured) {
+    query = query.eq('is_featured', true)
+  }
+  if (isBestseller) {
+    query = query.eq('is_bestseller', true)
+  }
 
   switch (sort) {
     case 'price_asc':  query = query.order('price', { ascending: true });  break
     case 'price_desc': query = query.order('price', { ascending: false }); break
-    case 'bestselling': query = query.eq('is_bestseller', true).order('created_at', { ascending: false }); break
+    case 'bestselling': query = query.order('is_bestseller', { ascending: false }).order('created_at', { ascending: false }); break
     default: query = query.order('created_at', { ascending: false })
   }
 
@@ -57,6 +72,26 @@ export async function getProductBySlug(slug) {
 
 export async function getFeaturedProducts(limit = 8, section = 'watches') {
   return getProducts({ limit, section, sort: 'newest' })
+}
+
+export async function getFeaturedPieces(limit = 6) {
+  const pieces = await getProducts({ limit, isFeatured: true })
+  if (pieces.length === 0) {
+    return getProducts({ limit })
+  }
+  return pieces
+}
+
+export async function getBestsellers(limit = 6) {
+  const best = await getProducts({ limit, isBestseller: true })
+  if (best.length === 0) {
+    return getProducts({ limit, sort: 'price_desc' })
+  }
+  return best
+}
+
+export async function getNewArrivals(limit = 8) {
+  return getProducts({ limit, sort: 'newest' })
 }
 
 // ─── CATEGORIES ──────────────────────────────────────────────

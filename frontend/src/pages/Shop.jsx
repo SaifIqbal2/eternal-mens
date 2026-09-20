@@ -44,11 +44,13 @@ export default function Shop() {
   const categorySlug = searchParams.get('category') || ''
   const searchQ = searchParams.get('q') || ''
   const sortParam = searchParams.get('sort') || 'newest'
+  const minPriceParam = searchParams.get('min_price') || ''
+  const maxPriceParam = searchParams.get('max_price') || ''
+  const inStockParam = searchParams.get('in_stock') === '1'
 
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState(searchQ)
 
   useEffect(() => {
     getCategories(section).then(setCategories).catch(console.error)
@@ -56,11 +58,19 @@ export default function Shop() {
 
   useEffect(() => {
     setLoading(true)
-    getProducts({ section, categorySlug: categorySlug || null, search: searchQ, sort: sortParam })
+    getProducts({
+      section,
+      categorySlug: categorySlug || null,
+      search: searchQ,
+      sort: sortParam,
+      minPrice: minPriceParam,
+      maxPrice: maxPriceParam,
+      inStockOnly: inStockParam,
+    })
       .then(setProducts)
       .catch(console.error)
       .finally(() => setLoading(false))
-  }, [section, categorySlug, searchQ, sortParam])
+  }, [section, categorySlug, searchQ, sortParam, minPriceParam, maxPriceParam, inStockParam])
 
   const applyFilters = (e) => {
     e.preventDefault()
@@ -68,25 +78,45 @@ export default function Shop() {
     const params = { section }
     const q = fd.get('q')?.trim()
     const cat = fd.get('category')
-    const sort = fd.get('sort')
+    const minP = fd.get('min_price')?.trim()
+    const maxP = fd.get('max_price')?.trim()
+    const inStock = fd.get('in_stock')
+
     if (q) params.q = q
     if (cat) params.category = cat
-    if (sort) params.sort = sort
+    if (sortParam && sortParam !== 'newest') params.sort = sortParam
+    if (minP) params.min_price = minP
+    if (maxP) params.max_price = maxP
+    if (inStock) params.in_stock = '1'
+
     setSearchParams(params)
   }
+
+  const handleSortChange = (e) => {
+    const newSort = e.target.value
+    const current = Object.fromEntries(searchParams.entries())
+    if (newSort === 'newest') {
+      delete current.sort
+    } else {
+      current.sort = newSort
+    }
+    setSearchParams(current)
+  }
+
+  const sectionLabel = section === 'watches' ? 'Watches' : 'Accessories'
 
   return (
     <section className="section" style={{ paddingTop: '3rem' }}>
       <div className="container">
         <p className="section-eyebrow">{products.length} Products</p>
         <h1 className="section-heading" style={{ marginBottom: '2rem' }}>
-          {section === 'watches' ? 'Watches' : 'Accessories'}
+          {sectionLabel}
         </h1>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem' }} className="collection-layout">
           {/* Filters Sidebar */}
           <aside style={{ maxWidth: '260px' }}>
-            <form onSubmit={applyFilters}>
+            <form onSubmit={applyFilters} key={`${section}-${categorySlug}-${searchQ}-${minPriceParam}-${maxPriceParam}-${inStockParam}`}>
               <div className="form-group">
                 <label>Search</label>
                 <input
@@ -98,9 +128,9 @@ export default function Shop() {
               </div>
 
               <div className="form-group">
-                <label>Category</label>
+                <label>{section === 'watches' ? 'Watch Type' : 'Category'}</label>
                 <select name="category" defaultValue={categorySlug}>
-                  <option value="">All Categories</option>
+                  <option value="">All {sectionLabel}</option>
                   {categories.map(c => (
                     <option key={c.id} value={c.slug}>{c.name}</option>
                   ))}
@@ -108,13 +138,32 @@ export default function Shop() {
               </div>
 
               <div className="form-group">
-                <label>Sort By</label>
-                <select name="sort" defaultValue={sortParam}>
-                  <option value="newest">Newest</option>
-                  <option value="bestselling">Best Selling</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                </select>
+                <label>Price Range (Rs)</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="number"
+                    name="min_price"
+                    defaultValue={minPriceParam}
+                    placeholder="Min"
+                  />
+                  <input
+                    type="number"
+                    name="max_price"
+                    defaultValue={maxPriceParam}
+                    placeholder="Max"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input
+                  type="checkbox"
+                  name="in_stock"
+                  id="in_stock"
+                  defaultChecked={inStockParam}
+                  style={{ width: 'auto' }}
+                />
+                <label htmlFor="in_stock" style={{ margin: 0 }}>In Stock Only</label>
               </div>
 
               <button type="submit" className="btn btn-outline-dark btn-block">Apply Filters</button>
@@ -128,6 +177,15 @@ export default function Shop() {
 
           {/* Products Grid */}
           <div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
+              <select value={sortParam} onChange={handleSortChange} style={{ maxWidth: '200px' }}>
+                <option value="newest">Newest</option>
+                <option value="bestselling">Best Selling</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+              </select>
+            </div>
+
             {loading ? (
               <p style={{ color: 'var(--graphite-soft)', paddingTop: '2rem' }}>Loading products...</p>
             ) : products.length === 0 ? (
