@@ -517,8 +517,8 @@ button { font-family: inherit; cursor: pointer; }
 
 .brand-statement { display: grid; gap: 3rem; align-items: center; }
 @media (min-width: 768px) { .brand-statement { grid-template-columns: 1fr 1fr; } }
-.brand-statement-image { aspect-ratio: 4/5; overflow: hidden; }
-.brand-statement-image img { width: 100%; height: 100%; object-fit: cover; }
+.brand-statement-image { overflow: hidden; min-height: 380px; }
+.brand-statement-image img { width: 100%; height: 100%; object-fit: cover; object-position: center center; }
 .brand-statement h2 { font-family: var(--font-display); font-size: clamp(1.9rem, 4vw, 2.75rem); line-height: 1.15; }
 .brand-statement p { margin-top: 1.5rem; color: rgba(246,244,239,0.7); max-width: 420px; line-height: 1.7; }
 
@@ -2736,7 +2736,7 @@ textarea {
   }
 
   .brand-statement-image {
-    aspect-ratio: 4 / 5;
+    min-height: 400px;
   }
 
   .brand-statement h2 {
