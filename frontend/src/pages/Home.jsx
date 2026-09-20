@@ -246,24 +246,21 @@ export default function Home() {
                         Rs {Number(p.price).toLocaleString()}
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleAddBestseller(p)}
+                    <Link
+                      to={`/product/${p.slug}`}
                       style={{
-                        background: isAdded ? 'var(--brass)' : '#111',
+                        background: '#111',
                         color: '#fff',
                         border: 'none',
                         padding: '0.45rem 0.9rem',
                         fontSize: '0.75rem',
                         letterSpacing: '0.08em',
-                        cursor: 'pointer',
                         textTransform: 'uppercase',
-                        transition: 'background 0.2s',
-                        borderRadius: '0',
+                        textDecoration: 'none',
                       }}
                     >
-                      {isAdded ? 'Added!' : 'ADD'}
-                    </button>
+                      VIEW
+                    </Link>
                   </div>
                 )
               })}
