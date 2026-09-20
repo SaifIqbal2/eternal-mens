@@ -224,40 +224,31 @@ export default function Home() {
                 const img = p.images?.[0]?.url || '/assets/images/1.jpg'
                 const isAdded = addedId === p.id
                 return (
-                  <div key={p.id} className="bestseller-row" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', padding: '1.25rem 0', borderBottom: '1px solid #e2ded7' }}>
-                    <span className="bestseller-rank mono" style={{ fontSize: '0.9rem', color: 'var(--graphite-soft)', width: '28px' }}>
+                  <div key={p.id} className="bestseller-row">
+                    <span className="bestseller-rank mono">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <Link to={`/product/${p.slug}`} className="bestseller-thumb" style={{ width: '64px', height: '64px', flexShrink: 0, overflow: 'hidden', background: '#ece8e1' }}>
-                      <img src={img} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Link to={`/product/${p.slug}`} className="bestseller-thumb">
+                      <img src={img} alt={p.name} loading="lazy" />
                     </Link>
-                    <div className="bestseller-info" style={{ flex: 1 }}>
+                    <div className="bestseller-info">
                       <Link to={`/product/${p.slug}`}>
-                        <h3 style={{ fontSize: '1rem', fontWeight: 500, margin: 0 }}>{p.name}</h3>
+                        <h3>{p.name}</h3>
                       </Link>
                       {p.stock > 0 && p.stock <= p.low_stock_threshold && (
-                        <p className="low-stock-label" style={{ fontSize: '0.75rem', color: 'var(--brass)', margin: '0.25rem 0 0' }}>
+                        <p className="low-stock-label">
                           Only {p.stock} left
                         </p>
                       )}
                     </div>
-                    <div className="bestseller-price" style={{ textAlign: 'right' }}>
-                      <span className="mono" style={{ fontSize: '0.95rem', fontWeight: 500, display: 'block' }}>
+                    <div className="bestseller-price">
+                      <span className="mono">
                         Rs {Number(p.price).toLocaleString()}
                       </span>
                     </div>
                     <Link
                       to={`/product/${p.slug}`}
-                      style={{
-                        background: '#111',
-                        color: '#fff',
-                        border: 'none',
-                        padding: '0.45rem 0.9rem',
-                        fontSize: '0.75rem',
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        textDecoration: 'none',
-                      }}
+                      className="bestseller-add-btn"
                     >
                       VIEW
                     </Link>

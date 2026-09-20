@@ -3520,3 +3520,93 @@ body.variant-modal-open {
 .thumb-btn { width:70px; height:70px; overflow:hidden; border:1px solid var(--hairline); background:none; padding:0; }
 .thumb-btn img { width:100%; height:100%; object-fit:cover; }
 
+
+/* ---------------- BESTSELLERS ROW FIX ---------------- */
+.bestseller-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #e2ded7;
+}
+
+.bestseller-rank {
+  font-size: 0.9rem;
+  color: var(--graphite-soft);
+  width: 28px;
+}
+
+.bestseller-thumb {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #ece8e1;
+}
+
+.bestseller-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bestseller-info {
+  flex: 1;
+}
+
+.bestseller-info h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.low-stock-label {
+  font-size: 0.75rem;
+  color: var(--brass);
+  margin: 0.25rem 0 0;
+}
+
+.bestseller-price {
+  text-align: right;
+}
+
+.bestseller-price .mono {
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: block;
+}
+
+.bestseller-add-btn {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 600px) {
+  .bestseller-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    position: relative;
+    padding-bottom: 3.5rem;
+  }
+  .bestseller-info {
+    min-width: 150px;
+  }
+  .bestseller-price {
+    text-align: left;
+    width: 100%;
+    margin-left: calc(28px + 64px + 1.5rem);
+  }
+  .bestseller-add-btn {
+    position: absolute;
+    bottom: 1rem;
+    right: 0;
+  }
+}

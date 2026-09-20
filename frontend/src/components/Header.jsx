@@ -35,8 +35,6 @@ export default function Header() {
           <Link to="/collection?section=accessories" onClick={closeMenu}>Accessories</Link>
           <Link to="/about" onClick={closeMenu}>About Us</Link>
           <Link to="/contact" onClick={closeMenu}>Contact Us</Link>
-          <Link to="/faq" onClick={closeMenu}>FAQ</Link>
-          <Link to="/shipping" onClick={closeMenu}>Shipping</Link>
         </nav>
 
         <div className="header-icons">
