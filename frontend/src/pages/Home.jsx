@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getFeaturedProducts, subscribeNewsletter } from '../lib/api'
+import { getFeaturedProducts, getCategories, subscribeNewsletter } from '../lib/api'
 
 function ProductCard({ p }) {
   const img = p.images?.[0]?.url || '/assets/images/1.jpg'
@@ -32,15 +32,20 @@ function ProductCard({ p }) {
 
 export default function Home() {
   const [featured, setFeatured] = useState([])
+  const [accessoryCategories, setAccessoryCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [subMsg, setSubMsg] = useState('')
 
   useEffect(() => {
-    getFeaturedProducts(8)
+    getFeaturedProducts(8, 'watches')
       .then(setFeatured)
       .catch(console.error)
       .finally(() => setLoading(false))
+
+    getCategories('accessories')
+      .then(setAccessoryCategories)
+      .catch(console.error)
   }, [])
 
   const handleSubscribe = async (e) => {
@@ -95,11 +100,28 @@ export default function Home() {
                   <path d="M 140.4 53.5 A 66 66 0 0 1 53.5 140.4" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
                 </svg>
                 <span className="category-orb-image" style={{ position: 'absolute', inset: '30px', borderRadius: '50%', overflow: 'hidden', display: 'block', background: '#ddd9d1' }}>
-                  <img src="/assets/images/watches.jpg" alt="Watches" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <img src="/assets/images/categories/watches.jpg" alt="Watches" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </span>
               </span>
               <span className="category-orb-label">Watches</span>
             </Link>
+
+            {accessoryCategories.map(cat => (
+              <Link key={cat.id} to={`/collection?section=accessories&category=${cat.slug}`} className="category-orb">
+                <span className="category-orb-visual" style={{ position: 'relative', display: 'block', width: '180px', height: '180px' }}>
+                  <svg className="orb-arc orb-arc-1" viewBox="0 0 160 160" width="180" height="180" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', fill: 'none' }}>
+                    <path d="M 19.6 106.5 A 66 66 0 0 1 106.5 19.6" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  <svg className="orb-arc orb-arc-2" viewBox="0 0 160 160" width="160" height="160" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', fill: 'none' }}>
+                    <path d="M 140.4 53.5 A 66 66 0 0 1 53.5 140.4" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  <span className="category-orb-image" style={{ position: 'absolute', inset: '30px', borderRadius: '50%', overflow: 'hidden', display: 'block', background: '#ddd9d1' }}>
+                    <img src={cat.image || `/assets/images/categories/${cat.slug}.jpg`} alt={cat.name} onError={(e) => { e.currentTarget.src = '/assets/images/bracelets.jpg' }} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  </span>
+                </span>
+                <span className="category-orb-label">{cat.name}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

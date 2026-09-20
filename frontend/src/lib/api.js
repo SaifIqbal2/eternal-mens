@@ -3,12 +3,13 @@ import { supabase } from './supabase'
 // ─── PRODUCTS ────────────────────────────────────────────────
 
 export async function getProducts({ section, categorySlug, search, sort, limit } = {}) {
+  const categoryRelation = (section || categorySlug) ? 'category:categories!inner' : 'category:categories'
   let query = supabase
     .from('products')
     .select(`
       id, name, slug, sku, brand, price, compare_at_price,
       stock, low_stock_threshold, is_featured, is_bestseller, status,
-      category:categories(id, name, slug, section),
+      ${categoryRelation}(id, name, slug, section),
       images:product_images(url, alt_text, sort_order)
     `)
     .eq('status', 'ACTIVE')
@@ -54,8 +55,8 @@ export async function getProductBySlug(slug) {
   return data
 }
 
-export async function getFeaturedProducts(limit = 8) {
-  return getProducts({ limit, sort: 'newest' })
+export async function getFeaturedProducts(limit = 8, section = 'watches') {
+  return getProducts({ limit, section, sort: 'newest' })
 }
 
 // ─── CATEGORIES ──────────────────────────────────────────────
