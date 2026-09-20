@@ -163,7 +163,7 @@ export default function Home() {
             </div>
 
             <div className="featured-editorial" id="featuredCarousel">
-              <div className="featured-editorial-image" style={{ position: 'relative', minHeight: '480px' }}>
+              <div className="featured-editorial-image" style={{ position: 'relative', minHeight: '480px', background: '#111' }}>
                 {featuredPieces.map((p, i) => {
                   const img = p.images?.[0]?.url || '/assets/images/1.jpg'
                   return (
@@ -172,7 +172,7 @@ export default function Home() {
                       className={`featured-slide-image${i === featuredIndex ? ' is-active' : ''}`}
                       style={{ position: 'absolute', inset: 0 }}
                     >
-                      <img src={img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+                      <img src={img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center center', display: 'block' }} />
                     </div>
                   )
                 })}
