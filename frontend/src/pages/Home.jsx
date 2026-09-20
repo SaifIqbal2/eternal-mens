@@ -65,27 +65,16 @@ export default function Home() {
   }
 
   // Arrivals Carousel Navigation
+  const ARRIVALS_PER_PAGE = typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 4
+
   const prevArrivals = () => {
     if (newArrivals.length === 0) return
-    const nextIdx = Math.max(0, arrivalsIndex - 1)
-    setArrivalsIndex(nextIdx)
-    scrollArrivals(nextIdx)
+    setArrivalsIndex((i) => Math.max(0, i - 1))
   }
 
   const nextArrivals = () => {
     if (newArrivals.length === 0) return
-    const maxIdx = Math.max(0, newArrivals.length - 1)
-    const nextIdx = Math.min(maxIdx, arrivalsIndex + 1)
-    setArrivalsIndex(nextIdx)
-    scrollArrivals(nextIdx)
-  }
-
-  const scrollArrivals = (idx) => {
-    if (!arrivalsTrackRef.current) return
-    const items = arrivalsTrackRef.current.children
-    if (items && items[idx]) {
-      items[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
-    }
+    setArrivalsIndex((i) => Math.min(newArrivals.length - 1, i + 1))
   }
 
   const activeFeatured = featuredPieces[featuredIndex]
@@ -289,42 +278,53 @@ export default function Home() {
                 </button>
 
                 <div
-                  className="new-arrivals-track"
-                  id="arrivalsCarousel"
-                  ref={arrivalsTrackRef}
-                  style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollbarWidth: 'none', paddingBottom: '1rem' }}
+                  style={{ overflow: 'hidden', width: '100%' }}
                 >
-                  {newArrivals.map((p, i) => {
-                    const img = p.images?.[0]?.url || '/assets/images/1.jpg'
-                    return (
-                      <div
-                        key={p.id}
-                        className="new-arrival-item"
-                        style={{ flex: '0 0 calc(25% - 1.15rem)', minWidth: '220px', scrollSnapAlign: 'start' }}
-                      >
-                        <Link to={`/product/${p.slug}`} className="new-arrival-image" style={{ display: 'block', aspectRatio: '1', overflow: 'hidden', background: '#eee', marginBottom: '1rem' }}>
-                          <img src={img} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </Link>
+                  <div
+                    className="new-arrivals-track"
+                    id="arrivalsCarousel"
+                    ref={arrivalsTrackRef}
+                    style={{
+                      display: 'flex',
+                      gap: '1.5rem',
+                      transition: 'transform 0.45s cubic-bezier(0.4,0,0.2,1)',
+                      transform: `translateX(calc(-${arrivalsIndex} * (25% + 0.375rem)))`,
+                      paddingBottom: '1rem',
+                      willChange: 'transform',
+                    }}
+                  >
+                    {newArrivals.map((p, i) => {
+                      const img = p.images?.[0]?.url || '/assets/images/1.jpg'
+                      return (
+                        <div
+                          key={p.id}
+                          className="new-arrival-item"
+                          style={{ flex: '0 0 calc(25% - 1.15rem)', minWidth: '220px' }}
+                        >
+                          <Link to={`/product/${p.slug}`} className="new-arrival-image" style={{ display: 'block', aspectRatio: '1', overflow: 'hidden', background: '#eee', marginBottom: '1rem' }}>
+                            <img src={img} alt={p.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </Link>
 
-                        <div className="new-arrival-info">
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                            <span className="new-arrival-number mono" style={{ fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>
-                              {String(i + 1).padStart(2, '0')}
+                          <div className="new-arrival-info">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                              <span className="new-arrival-number mono" style={{ fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>
+                                {String(i + 1).padStart(2, '0')}
+                              </span>
+                              <Link to={`/product/${p.slug}`}>
+                                <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                                  {p.name}
+                                </h3>
+                              </Link>
+                            </div>
+
+                            <span className="new-arrival-price mono" style={{ fontSize: '0.85rem', color: 'var(--graphite)' }}>
+                              Rs {Number(p.price).toLocaleString()}
                             </span>
-                            <Link to={`/product/${p.slug}`}>
-                              <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
-                                {p.name}
-                              </h3>
-                            </Link>
                           </div>
-
-                          <span className="new-arrival-price mono" style={{ fontSize: '0.85rem', color: 'var(--graphite)' }}>
-                            Rs {Number(p.price).toLocaleString()}
-                          </span>
                         </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
+                  </div>
                 </div>
 
                 <button
