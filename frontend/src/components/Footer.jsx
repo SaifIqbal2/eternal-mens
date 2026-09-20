@@ -14,10 +14,9 @@ export default function Footer() {
         <nav className="footer-col">
           <Link to="/collection?section=watches">Watches</Link>
           <Link to="/collection?section=accessories">Accessories</Link>
-          <Link to="/new-arrivals">New Arrivals</Link>
-          <Link to="/best-sellers">Best Sellers</Link>
+          <Link to="/collection">New Arrivals</Link>
           <Link to="/order-tracking">Order Tracking</Link>
-          {/* <Link to="/returns">Exchange &amp; Returns</Link> */}
+          <Link to="/returns">Exchange &amp; Returns</Link>
           <Link to="/shipping">Shipping &amp; Deliveries</Link>
         </nav>
 
@@ -25,9 +24,8 @@ export default function Footer() {
           <Link to="/about">About Us</Link>
           <Link to="/contact">Contact Us</Link>
           <Link to="/faq">FAQ</Link>
-          {/* <Link to="/privacy">Privacy Policy</Link> */}
+          <Link to="/privacy">Privacy Policy</Link>
           <Link to="/terms">Terms &amp; Conditions</Link>
-          {/* <a href="#">Instagram</a> */}
         </nav>
 
       </div>

@@ -60,8 +60,14 @@ export default function Checkout() {
         discountCode: discountCode || '',
         discountAmount,
       })
+      const itemsSnapshot = cart.map(item => ({
+        product_name: item.name,
+        variant_name: item.variant_name || null,
+        quantity: item.quantity,
+        line_total: item.price * item.quantity,
+      }))
       clearCart()
-      navigate('/order-confirmation', { state: { order } })
+      navigate('/order-confirmation', { state: { order, items: itemsSnapshot } })
     } catch (err) {
       setError(err.message || 'Failed to place order. Please try again.')
     } finally {

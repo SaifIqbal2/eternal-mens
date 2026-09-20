@@ -7,10 +7,14 @@ import ProductDetails from './pages/ProductDetails'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import OrderConfirmation from './pages/OrderConfirmation'
+import OrderTracking from './pages/OrderTracking'
 import About from './pages/About'
 import Contact from './pages/Contact'
 import Faq from './pages/Faq'
 import Shipping from './pages/Shipping'
+import Returns from './pages/Returns'
+import Privacy from './pages/Privacy'
+import Terms from './pages/Terms'
 
 // Lazy loaded Admin Panel (separate chunk, won't slow down storefront)
 const AdminLogin = lazy(() => import('./admin/AdminLogin'))
@@ -65,16 +69,21 @@ function App() {
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="order-confirmation" element={<OrderConfirmation />} />
+            {/* Order Tracking */}
+            <Route path="order-tracking" element={<OrderTracking />} />
             {/* Info pages */}
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
             <Route path="faq" element={<Faq />} />
             <Route path="shipping" element={<Shipping />} />
+            <Route path="returns" element={<Returns />} />
+            <Route path="privacy" element={<Privacy />} />
+            <Route path="terms" element={<Terms />} />
             {/* Redirect legacy paths */}
             <Route path="new-arrivals" element={<Navigate to="/collection" replace />} />
             <Route path="best-sellers" element={<Navigate to="/collection" replace />} />
-            <Route path="order-tracking" element={<Navigate to="/contact" replace />} />
-            <Route path="*" element={<div className="empty-state"><h1>Page Not Found</h1></div>} />
+            {/* 404 */}
+            <Route path="*" element={<div className="empty-state" style={{ padding: '6rem 1rem', textAlign: 'center' }}><h1>Page Not Found</h1></div>} />
           </Route>
         </Routes>
       </Suspense>
