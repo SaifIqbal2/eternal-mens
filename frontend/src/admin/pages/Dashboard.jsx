@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { adminGetStats, adminGetOrders, adminGetProducts } from '../../lib/api'
 
@@ -41,7 +41,7 @@ export default function Dashboard() {
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', marginBottom: '1.75rem' }}>Dashboard</h1>
 
       {/* Stats Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <StatCard label="Today's Sales" value={`Rs ${Number(stats.todaySales).toLocaleString()}`} />
         <StatCard label="Total Sales" value={`Rs ${Number(stats.totalSales).toLocaleString()}`} />
         <StatCard label="Today's Orders" value={stats.todayOrders} />
