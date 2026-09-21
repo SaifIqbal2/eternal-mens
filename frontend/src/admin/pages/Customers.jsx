@@ -1,10 +1,11 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { adminGetCustomers } from '../../lib/api'
 
 export default function AdminCustomers() {
   const [customers, setCustomers] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [expanded, setExpanded] = useState(null)
 
   useEffect(() => {
     adminGetCustomers().then(setCustomers).catch(console.error).finally(() => setLoading(false))
@@ -37,21 +38,29 @@ export default function AdminCustomers() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
-                {['Name', 'Email', 'Phone', 'Joined'].map(h => (
+                {['Name', 'Email', 'Phone', 'Orders', 'Total Spent', 'Joined'].map(h => (
                   <th key={h} style={{ padding: '0.6rem 0.75rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan="4" style={{ padding: '2rem', color: 'var(--admin-text-muted)', textAlign: 'center' }}>No customers found.</td></tr>
+                <tr><td colSpan="6" style={{ padding: '2rem', color: 'var(--admin-text-muted)', textAlign: 'center' }}>No customers found.</td></tr>
               ) : filtered.map(c => (
-                <tr key={c.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
+                <tr key={c.id} style={{ borderBottom: '1px solid var(--admin-border)', cursor: 'pointer' }} onClick={() => setExpanded(expanded === c.id ? null : c.id)}>
                   <td style={{ padding: '0.7rem 0.75rem', fontWeight: 500 }}>{c.name}</td>
                   <td style={{ padding: '0.7rem 0.75rem', color: 'var(--admin-text-muted)' }}>
-                    <a href={`mailto:${c.email}`} style={{ color: 'var(--brass-soft)' }}>{c.email}</a>
+                    <a href={`mailto:${c.email}`} style={{ color: 'var(--brass-soft)' }} onClick={e => e.stopPropagation()}>{c.email}</a>
                   </td>
-                  <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{c.phone || 'â€”'}</td>
+                  <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{c.phone || '—'}</td>
+                  <td style={{ padding: '0.7rem 0.75rem', textAlign: 'center' }}>
+                    <span style={{ background: c.total_orders > 0 ? '#dcfce7' : '#f1f5f9', color: c.total_orders > 0 ? '#166534' : 'var(--admin-text-muted)', padding: '0.15rem 0.5rem', fontSize: '0.72rem', borderRadius: '3px', fontFamily: 'var(--font-mono)' }}>
+                      {c.total_orders}
+                    </span>
+                  </td>
+                  <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.78rem', fontWeight: 500, color: c.total_spent > 0 ? 'var(--admin-text)' : 'var(--admin-text-muted)' }}>
+                    {c.total_spent > 0 ? `Rs ${Number(c.total_spent).toLocaleString()}` : '—'}
+                  </td>
                   <td style={{ padding: '0.7rem 0.75rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>
                     {new Date(c.created_at).toLocaleDateString('en-PK')}
                   </td>

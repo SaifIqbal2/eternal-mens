@@ -468,10 +468,14 @@ export async function adminDeleteMessage(id) {
 export async function adminGetCustomers() {
   const { data, error } = await supabase
     .from('customers')
-    .select('*')
+    .select('*, orders(id, total, status)')
     .order('created_at', { ascending: false })
   if (error) throw error
-  return data || []
+  return (data || []).map(c => ({
+    ...c,
+    total_orders: c.orders?.length || 0,
+    total_spent: (c.orders || []).filter(o => o.status !== 'CANCELLED').reduce((s, o) => s + Number(o.total), 0)
+  }))
 }
 
 // â”€â”€â”€ ADMIN â€” DASHBOARD STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
