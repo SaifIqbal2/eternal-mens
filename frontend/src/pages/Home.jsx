@@ -274,7 +274,7 @@ export default function Home() {
 
       {/* SECTION 4: NEW ARRIVALS CAROUSEL */}
       {newArrivals.length > 0 && (
-        <section className="new-arrivals-section reveal in-view">
+        <section id="new-arrivals" className="new-arrivals-section reveal in-view">
           <div className="new-arrivals-bg"></div>
 
           <div className="new-arrivals-panel">
