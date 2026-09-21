@@ -1,7 +1,7 @@
-﻿import React, { useEffect, useState } from 'react'
-import { adminGetCategories, adminSaveCategory, adminDeleteCategory } from '../../lib/api'
+import React, { useEffect, useState } from 'react'
+import { adminGetCategories, adminSaveCategory, adminDeleteCategory, adminUploadCategoryImage } from '../../lib/api'
 
-const EMPTY = { name: '', slug: '', section: 'watches', is_active: true, sort_order: 0, description: '' }
+const EMPTY = { name: '', slug: '', section: 'watches', is_active: true, sort_order: 0, description: '', image_url: '' }
 
 function slugify(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
@@ -12,6 +12,7 @@ export default function AdminCategories() {
   const [loading, setLoading] = useState(true)
   const [form, setForm] = useState(EMPTY)
   const [editing, setEditing] = useState(null)
+  const [imageFile, setImageFile] = useState(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -31,18 +32,25 @@ export default function AdminCategories() {
 
   const startEdit = (c) => {
     setEditing(c.id)
-    setForm({ name: c.name, slug: c.slug, section: c.section, is_active: c.is_active, sort_order: c.sort_order, description: c.description || '' })
+    setForm({ name: c.name, slug: c.slug, section: c.section, is_active: c.is_active, sort_order: c.sort_order, description: c.description || '', image_url: c.image_url || '' })
+    setImageFile(null)
     setError('')
   }
 
-  const cancelEdit = () => { setEditing(null); setForm(EMPTY); setError('') }
+  const cancelEdit = () => { setEditing(null); setForm(EMPTY); setImageFile(null); setError('') }
 
   const handleSave = async (e) => {
     e.preventDefault()
     setSaving(true)
     setError('')
     try {
-      await adminSaveCategory(editing ? { ...form, id: editing } : form)
+      let savedCat = await adminSaveCategory(editing ? { ...form, id: editing } : form)
+      
+      if (imageFile) {
+        const url = await adminUploadCategoryImage(savedCat.id, imageFile)
+        await adminSaveCategory({ id: savedCat.id, image_url: url })
+      }
+      
       cancelEdit()
       load()
     } catch (err) {
@@ -87,6 +95,27 @@ export default function AdminCategories() {
               <label style={labelStyle}>Sort Order</label>
               <input type="number" value={form.sort_order} onChange={set('sort_order')} style={inputStyle} min="0" />
             </div>
+            
+            <div style={{ marginBottom: '1.25rem' }}>
+              <label style={labelStyle}>Category Image</label>
+              {form.image_url && !imageFile && (
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <img src={form.image_url} alt="Current" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
+                </div>
+              )}
+              {imageFile && (
+                <div style={{ marginBottom: '0.5rem' }}>
+                  <img src={URL.createObjectURL(imageFile)} alt="Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', opacity: 0.7 }} />
+                </div>
+              )}
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={e => setImageFile(e.target.files[0] || null)}
+                style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }} 
+              />
+            </div>
+
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', marginBottom: '1.25rem', cursor: 'pointer' }}>
               <input type="checkbox" checked={form.is_active} onChange={set('is_active')} />
               Active (visible on store)
@@ -111,7 +140,7 @@ export default function AdminCategories() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
-                    {['Name', 'Slug', 'Section', 'Order', 'Active', ''].map(h => (
+                    {['Image', 'Name', 'Slug', 'Section', 'Order', 'Active', ''].map(h => (
                       <th key={h} style={{ padding: '0.6rem 0.75rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                     ))}
                   </tr>
@@ -119,6 +148,12 @@ export default function AdminCategories() {
                 <tbody>
                   {categories.map(c => (
                     <tr key={c.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
+                      <td style={{ padding: '0.5rem 0.75rem' }}>
+                        {c.image_url ? 
+                          <img src={c.image_url} alt={c.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} /> 
+                          : <div style={{ width: '40px', height: '40px', background: 'var(--admin-border-strong)', borderRadius: '4px' }} />
+                        }
+                      </td>
                       <td style={{ padding: '0.7rem 0.75rem', fontWeight: 500 }}>{c.name}</td>
                       <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{c.slug}</td>
                       <td style={{ padding: '0.7rem 0.75rem', color: 'var(--admin-text-muted)' }}>{c.section}</td>

@@ -386,6 +386,19 @@ export async function adminSaveCategory(cat) {
   }
 }
 
+export async function adminUploadCategoryImage(categoryId, file) {
+  const ext = file.name.split('.').pop()
+  const path = `categories/${categoryId}/${Date.now()}.${ext}`
+
+  const { error: uploadErr } = await supabase.storage
+    .from('product-images') // Re-using product-images bucket
+    .upload(path, file, { upsert: false })
+  if (uploadErr) throw uploadErr
+
+  const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(path)
+  return urlData.publicUrl
+}
+
 export async function adminDeleteCategory(id) {
   const { error } = await supabase.from('categories').delete().eq('id', id)
   if (error) throw error
