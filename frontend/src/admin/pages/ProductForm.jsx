@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { adminGetProduct, adminSaveProduct, adminGetCategories, adminUploadProductImage, adminDeleteProductImage, adminGetVariants, adminSaveVariant, adminDeleteVariant } from '../../lib/api'
 
@@ -221,32 +221,44 @@ export default function ProductForm() {
             {/* Images */}
             <section style={sectionStyle}>
               <h3 style={sectionTitle}>Images</h3>
-              {!isNew && !productId && (
-                <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
-                  Save the product first to upload images.
-                </p>
-              )}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-                {images.map(img => (
-                  <div key={img.id} style={{ position: 'relative', width: '80px', height: '80px' }}>
-                    <img src={img.url} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteImage(img)}
-                      style={{ position: 'absolute', top: '2px', right: '2px', background: '#a83232', color: '#fff', border: 'none', width: '18px', height: '18px', fontSize: '10px', cursor: 'pointer', lineHeight: 1 }}
-                    >Ã—</button>
+              {!productId ? (
+                <div style={{ background: '#fff8e1', border: '1px solid #f59e0b', padding: '0.75rem 1rem', borderRadius: '4px', marginBottom: '0.75rem' }}>
+                  <p style={{ color: '#92400e', fontSize: '0.82rem', margin: 0 }}>
+                    ⚠ First save the product (click "Create Product"), then you can upload images.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+                    {images.map(img => (
+                      <div key={img.id} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                        <img src={img.url} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteImage(img)}
+                          style={{ position: 'absolute', top: '2px', right: '2px', background: '#a83232', color: '#fff', border: 'none', width: '18px', height: '18px', fontSize: '10px', cursor: 'pointer', lineHeight: 1 }}
+                        >&times;</button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageUpload}
-                disabled={uploading || !productId}
-                style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}
-              />
-              {uploading && <p style={{ color: 'var(--brass-soft)', fontSize: '0.8rem', marginTop: '0.5rem' }}>Uploading...</p>}
+                  <label style={{ display: 'inline-block', cursor: 'pointer' }}>
+                    <span style={{ background: 'var(--brass)', color: '#fff', padding: '0.5rem 1.25rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'inline-block' }}>
+                      {uploading ? 'Uploading...' : '+ Upload Images'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  {images.length === 0 && !uploading && (
+                    <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.8rem', marginTop: '0.5rem' }}>No images yet.</p>
+                  )}
+                </>
+              )}
             </section>
 
             {/* Variants */}
