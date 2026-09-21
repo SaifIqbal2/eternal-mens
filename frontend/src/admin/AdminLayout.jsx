@@ -4,15 +4,15 @@ import { supabase } from '../lib/supabase'
 import { adminLogout } from '../lib/api'
 
 const navLinks = [
-  { to: '/admin',            label: 'Dashboard',   icon: 'Ã¢â€”Ë†' },
-  { to: '/admin/orders',     label: 'Orders',      icon: 'Ã°Å¸â€œÂ¦' },
-  { to: '/admin/products',   label: 'Products',    icon: 'Ã¢Å’Å¡' },
-  { to: '/admin/inventory',  label: 'Inventory',   icon: 'Ã°Å¸â€œÅ ' },
-  { to: '/admin/categories', label: 'Categories',  icon: 'Ã°Å¸â€”â€š' },
-  { to: '/admin/discounts',  label: 'Discounts',   icon: 'Ã°Å¸ÂÂ·' },
-  { to: '/admin/messages',   label: 'Messages',    icon: 'Ã¢Å“â€°' },
-  { to: '/admin/reviews',    label: 'Reviews',     icon: 'Ã¢Ëœâ€¦' },
-  { to: '/admin/customers',  label: 'Customers',   icon: 'Ã°Å¸â€˜Â¤' },
+  { to: '/admin',            label: 'Dashboard',   icon: 'o' },
+  { to: '/admin/orders',     label: 'Orders',      icon: '#' },
+  { to: '/admin/products',   label: 'Products',    icon: 'P' },
+  { to: '/admin/inventory',  label: 'Inventory',   icon: '=' },
+  { to: '/admin/categories', label: 'Categories',  icon: 'C' },
+  { to: '/admin/discounts',  label: 'Discounts',   icon: '%' },
+  { to: '/admin/messages',   label: 'Messages',    icon: '@' },
+  { to: '/admin/reviews',    label: 'Reviews',     icon: '*' },
+  { to: '/admin/customers',  label: 'Customers',   icon: 'U' },
 ]
 
 export default function AdminLayout() {
@@ -108,4 +108,5 @@ export default function AdminLayout() {
     </div>
   )
 }
+
 
