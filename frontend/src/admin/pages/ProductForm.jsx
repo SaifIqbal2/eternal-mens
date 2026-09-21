@@ -7,7 +7,7 @@ const EMPTY = {
   description: '', materials: '', dimensions: '', weight: '',
   price: '', compare_at_price: '', cost_price: '',
   stock: 0, low_stock_threshold: 5,
-  status: 'DRAFT', is_featured: false, is_bestseller: false,
+  status: 'DRAFT', is_featured: false, is_bestseller: false, is_new_arrival: false
 }
 
 function slugify(str) {
@@ -197,7 +197,7 @@ export default function ProductForm() {
                   <option value="ACTIVE">Active</option>
                 </select>
               </div>
-              <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
                   <input type="checkbox" checked={form.is_featured} onChange={set('is_featured')} />
                   Featured
@@ -205,6 +205,10 @@ export default function ProductForm() {
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
                   <input type="checkbox" checked={form.is_bestseller} onChange={set('is_bestseller')} />
                   Bestseller
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={form.is_new_arrival} onChange={set('is_new_arrival')} />
+                  New Arrival
                 </label>
               </div>
             </section>

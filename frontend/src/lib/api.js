@@ -2,13 +2,13 @@ import { supabase } from './supabase'
 
 // â”€â”€â”€ PRODUCTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-export async function getProducts({ section, categorySlug, search, sort, limit, minPrice, maxPrice, inStockOnly, isFeatured, isBestseller } = {}) {
+export async function getProducts({ section, categorySlug, search, sort, limit, minPrice, maxPrice, inStockOnly, isFeatured, isBestseller, isNewArrival } = {}) {
   const categoryRelation = (section || categorySlug) ? 'category:categories!inner' : 'category:categories'
   let query = supabase
     .from('products')
     .select(`
       id, name, slug, sku, brand, price, compare_at_price,
-      stock, low_stock_threshold, is_featured, is_bestseller, status,
+      stock, low_stock_threshold, is_featured, is_bestseller, is_new_arrival, status,
       ${categoryRelation}(id, name, slug, section),
       images:product_images(url, alt_text, sort_order),
       variants:product_variants(id, name, option_type, sku, price_override, stock, image, is_active)
@@ -38,6 +38,9 @@ export async function getProducts({ section, categorySlug, search, sort, limit, 
   }
   if (isBestseller) {
     query = query.eq('is_bestseller', true)
+  }
+  if (isNewArrival) {
+    query = query.eq('is_new_arrival', true)
   }
 
   switch (sort) {
@@ -92,7 +95,11 @@ export async function getBestsellers(limit = 6) {
 }
 
 export async function getNewArrivals(limit = 8) {
-  return getProducts({ limit, sort: 'newest' })
+  const newItems = await getProducts({ limit, isNewArrival: true })
+  if (newItems.length === 0) {
+    return getProducts({ limit, sort: 'newest' })
+  }
+  return newItems
 }
 
 // â”€â”€â”€ CATEGORIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
