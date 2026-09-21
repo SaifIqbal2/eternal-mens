@@ -34,12 +34,23 @@ export default function ProductForm() {
   useEffect(() => {
     adminGetCategories().then(setCategories).catch(console.error)
     if (!isNew) {
-      adminGetProduct(id).then(p => {
+      adminGetProduct(id).then(async p => {
         const { images: imgs, variants: vars, category, ...rest } = p
         setForm({ ...EMPTY, ...rest })
         setImages(imgs || [])
-        setVariants(vars || [])
         setProductId(p.id)
+        // Load variants - try from join first, then fallback to direct query
+        if (vars && vars.length > 0) {
+          setVariants(vars)
+        } else {
+          // Fallback: load variants directly (handles RLS join issues)
+          try {
+            const directVars = await adminGetVariants(p.id)
+            setVariants(directVars || [])
+          } catch {
+            setVariants([])
+          }
+        }
       }).catch(() => setError('Product not found'))
     }
   }, [id])
