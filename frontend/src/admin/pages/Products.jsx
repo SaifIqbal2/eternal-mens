@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { adminGetProducts, adminDeleteProduct } from '../../lib/api'
 
@@ -42,36 +42,36 @@ export default function AdminProducts() {
         placeholder="Search by name or SKU..."
         value={search}
         onChange={e => setSearch(e.target.value)}
-        style={{ marginBottom: '1.25rem', width: '100%', maxWidth: '360px', background: '#1a1a1c', border: '1px solid #2a2a2d', color: 'var(--bone)', padding: '0.6rem 0.75rem', fontSize: '0.85rem' }}
+        style={{ marginBottom: '1.25rem', width: '100%', maxWidth: '360px', background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text)', padding: '0.6rem 0.75rem', fontSize: '0.85rem' }}
       />
 
       {loading ? (
-        <p style={{ color: 'var(--graphite-soft)' }}>Loading products...</p>
+        <p style={{ color: 'var(--admin-text-muted)' }}>Loading products...</p>
       ) : (
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #2a2a2d' }}>
+              <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
                 {['Image', 'Name', 'SKU', 'Category', 'Price', 'Stock', 'Status', ''].map(h => (
-                  <th key={h} style={{ padding: '0.6rem 0.5rem', textAlign: 'left', color: 'var(--graphite-soft)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                  <th key={h} style={{ padding: '0.6rem 0.5rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan="8" style={{ padding: '2rem', color: 'var(--graphite-soft)', textAlign: 'center' }}>No products found.</td></tr>
+                <tr><td colSpan="8" style={{ padding: '2rem', color: 'var(--admin-text-muted)', textAlign: 'center' }}>No products found.</td></tr>
               ) : filtered.map(p => (
-                <tr key={p.id} style={{ borderBottom: '1px solid #1e1e20' }}>
+                <tr key={p.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
                   <td style={{ padding: '0.6rem 0.5rem' }}>
-                    <div style={{ width: '48px', height: '48px', background: '#2a2a2d', overflow: 'hidden' }}>
+                    <div style={{ width: '48px', height: '48px', background: 'var(--admin-border-strong)', overflow: 'hidden' }}>
                       {p.images?.[0]?.url && <img src={p.images[0].url} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                     </div>
                   </td>
                   <td style={{ padding: '0.6rem 0.5rem', fontWeight: 500 }}>{p.name}</td>
-                  <td style={{ padding: '0.6rem 0.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>{p.sku}</td>
-                  <td style={{ padding: '0.6rem 0.5rem', color: 'var(--graphite-soft)' }}>{p.category?.name}</td>
+                  <td style={{ padding: '0.6rem 0.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{p.sku}</td>
+                  <td style={{ padding: '0.6rem 0.5rem', color: 'var(--admin-text-muted)' }}>{p.category?.name}</td>
                   <td style={{ padding: '0.6rem 0.5rem', fontFamily: 'var(--font-mono)' }}>Rs {Number(p.price).toLocaleString()}</td>
-                  <td style={{ padding: '0.6rem 0.5rem', fontFamily: 'var(--font-mono)', color: p.stock === 0 ? '#a83232' : p.stock <= p.low_stock_threshold ? '#c9a96a' : 'var(--bone)' }}>
+                  <td style={{ padding: '0.6rem 0.5rem', fontFamily: 'var(--font-mono)', color: p.stock === 0 ? '#a83232' : p.stock <= p.low_stock_threshold ? '#c9a96a' : 'var(--admin-text)' }}>
                     {p.stock}
                   </td>
                   <td style={{ padding: '0.6rem 0.5rem' }}>
@@ -93,7 +93,7 @@ export default function AdminProducts() {
       )}
 
       <style>{`
-        .admin-btn-primary { background: var(--brass); color: var(--bone); padding: 0.6rem 1.25rem; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; display: inline-block; }
+        .admin-btn-primary { background: var(--brass); color: var(--admin-text); padding: 0.6rem 1.25rem; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; display: inline-block; }
         .admin-btn-primary:hover { background: var(--brass-soft); color: var(--ink) !important; }
       `}</style>
     </div>

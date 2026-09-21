@@ -1,1 +1,16 @@
 /* Cleaned index.css to rely entirely on original PHP styles */
+
+:root {
+  --admin-bg-main: #f4f5f7;
+  --admin-bg: #ffffff;
+  --admin-bg-sec: #ffffff;
+  --admin-border: #e2e8f0;
+  --admin-border-strong: #cbd5e1;
+  --admin-text: #1e293b;
+  --admin-text-muted: #64748b;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}

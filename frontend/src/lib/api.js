@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-// ─── PRODUCTS ────────────────────────────────────────────────
+// â”€â”€â”€ PRODUCTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getProducts({ section, categorySlug, search, sort, limit, minPrice, maxPrice, inStockOnly, isFeatured, isBestseller } = {}) {
   const categoryRelation = (section || categorySlug) ? 'category:categories!inner' : 'category:categories'
@@ -62,7 +62,7 @@ export async function getProductBySlug(slug) {
       category:categories(id, name, slug, section),
       images:product_images(id, url, alt_text, sort_order),
       variants:product_variants(id, name, option_type, sku, price_override, stock, image, is_active),
-      reviews(id, author_name, rating, title, body, created_at)
+      reviews(id, author_name, rating, body, created_at, is_approved)
     `)
     .eq('slug', slug)
     .eq('status', 'ACTIVE')
@@ -95,7 +95,7 @@ export async function getNewArrivals(limit = 8) {
   return getProducts({ limit, sort: 'newest' })
 }
 
-// ─── CATEGORIES ──────────────────────────────────────────────
+// â”€â”€â”€ CATEGORIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function getCategories(section = null) {
   let query = supabase
@@ -111,7 +111,7 @@ export async function getCategories(section = null) {
   return data || []
 }
 
-// ─── ORDERS ──────────────────────────────────────────────────
+// â”€â”€â”€ ORDERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function generateOrderNumber() {
   const num = Math.floor(1000 + Math.random() * 9000)
@@ -123,7 +123,17 @@ export async function placeOrder({ cart, form, discountCode = '', discountAmount
   const shippingCost = 0
   const total = subtotal - discountAmount + shippingCost
 
-  // 1. Insert order
+  // 1. Upsert customer
+  await supabase.from('customers').upsert({
+    email: form.email,
+    name: form.name,
+    phone: form.phone,
+    address: form.address,
+    city: form.city,
+    country: form.country || 'Pakistan'
+  }, { onConflict: 'email' })
+
+  // 2. Insert order
   const { data: order, error: orderErr } = await supabase
     .from('orders')
     .insert({
@@ -168,7 +178,7 @@ export async function placeOrder({ cart, form, discountCode = '', discountAmount
   return order
 }
 
-// ─── DISCOUNTS ───────────────────────────────────────────────
+// â”€â”€â”€ DISCOUNTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function validateDiscount(code, subtotal) {
   const { data, error } = await supabase
@@ -193,7 +203,7 @@ export async function validateDiscount(code, subtotal) {
   return { valid: true, discount: data, amount: Math.min(amount, subtotal) }
 }
 
-// ─── CONTACT ─────────────────────────────────────────────────
+// â”€â”€â”€ CONTACT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function submitContactMessage({ name, email, message }) {
   const { error } = await supabase
@@ -203,7 +213,7 @@ export async function submitContactMessage({ name, email, message }) {
   return true
 }
 
-// ─── NEWSLETTER ──────────────────────────────────────────────
+// â”€â”€â”€ NEWSLETTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function subscribeNewsletter(email) {
   const { error } = await supabase
@@ -213,7 +223,7 @@ export async function subscribeNewsletter(email) {
   return true
 }
 
-// ─── ADMIN — AUTH ────────────────────────────────────────────
+// â”€â”€â”€ ADMIN â€” AUTH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminLogin(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
@@ -239,7 +249,7 @@ export async function isAdmin(userId) {
   return !!data
 }
 
-// ─── ADMIN — PRODUCTS ────────────────────────────────────────
+// â”€â”€â”€ ADMIN â€” PRODUCTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetProducts() {
   const { data, error } = await supabase
@@ -288,7 +298,7 @@ export async function adminDeleteProduct(id) {
   if (error) throw error
 }
 
-// ─── ADMIN — PRODUCT IMAGES ──────────────────────────────────
+// â”€â”€â”€ ADMIN â€” PRODUCT IMAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminUploadProductImage(productId, file) {
   const ext = file.name.split('.').pop()
@@ -319,7 +329,7 @@ export async function adminDeleteProductImage(imageId, url) {
   if (error) throw error
 }
 
-// ─── ADMIN — ORDERS ──────────────────────────────────────────
+// â”€â”€â”€ ADMIN â€” ORDERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetOrders({ status, limit = 50 } = {}) {
   let query = supabase
@@ -355,7 +365,7 @@ export async function adminDeleteOrder(id) {
   if (error) throw error
 }
 
-// ─── ADMIN — CATEGORIES ──────────────────────────────────────
+// â”€â”€â”€ ADMIN â€” CATEGORIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetCategories() {
   const { data, error } = await supabase.from('categories').select('*').order('sort_order')
@@ -381,7 +391,7 @@ export async function adminDeleteCategory(id) {
   if (error) throw error
 }
 
-// ─── ADMIN — DISCOUNTS ───────────────────────────────────────
+// â”€â”€â”€ ADMIN â€” DISCOUNTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetDiscounts() {
   const { data, error } = await supabase.from('discounts').select('*').order('created_at', { ascending: false })
@@ -407,7 +417,7 @@ export async function adminDeleteDiscount(id) {
   if (error) throw error
 }
 
-// ─── ADMIN — MESSAGES ────────────────────────────────────────
+// â”€â”€â”€ ADMIN â€” MESSAGES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetMessages() {
   const { data, error } = await supabase
@@ -422,7 +432,12 @@ export async function adminMarkMessageRead(id) {
   await supabase.from('contact_messages').update({ is_read: true }).eq('id', id)
 }
 
-// ─── ADMIN — CUSTOMERS ───────────────────────────────────────
+export async function adminDeleteMessage(id) {
+  const { error } = await supabase.from('contact_messages').delete().eq('id', id)
+  if (error) throw error
+}
+
+// â”€â”€â”€ ADMIN â€” CUSTOMERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetCustomers() {
   const { data, error } = await supabase
@@ -433,7 +448,7 @@ export async function adminGetCustomers() {
   return data || []
 }
 
-// ─── ADMIN — DASHBOARD STATS ─────────────────────────────────
+// â”€â”€â”€ ADMIN â€” DASHBOARD STATS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetStats() {
   const today = new Date().toISOString().split('T')[0]
@@ -463,7 +478,7 @@ export async function adminGetStats() {
   }
 }
 
-// ─── ADMIN — PRODUCT VARIANTS ────────────────────────────────
+// â”€â”€â”€ ADMIN â€” PRODUCT VARIANTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export async function adminGetVariants(productId) {
   const { data, error } = await supabase
@@ -490,5 +505,36 @@ export async function adminSaveVariant(variant) {
 
 export async function adminDeleteVariant(id) {
   const { error } = await supabase.from('product_variants').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function adminUpdateStock(productId, newStock) {
+  const { error } = await supabase.from('products').update({ stock: newStock }).eq('id', productId)
+  if (error) throw error
+}
+
+export async function adminUpdateVariantStock(variantId, newStock) {
+  const { error } = await supabase.from('product_variants').update({ stock: newStock }).eq('id', variantId)
+  if (error) throw error
+}
+
+// --- ADMIN — REVIEWS -----------------------------------------
+
+export async function adminGetReviews() {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*, product:products(name, slug)')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data || []
+}
+
+export async function adminUpdateReviewStatus(id, isApproved) {
+  const { error } = await supabase.from('reviews').update({ is_approved: isApproved }).eq('id', id)
+  if (error) throw error
+}
+
+export async function adminDeleteReview(id) {
+  const { error } = await supabase.from('reviews').delete().eq('id', id)
   if (error) throw error
 }

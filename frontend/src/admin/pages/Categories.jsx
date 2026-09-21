@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { adminGetCategories, adminSaveCategory, adminDeleteCategory } from '../../lib/api'
 
 const EMPTY = { name: '', slug: '', section: 'watches', is_active: true, sort_order: 0, description: '' }
@@ -64,8 +64,8 @@ export default function AdminCategories() {
 
       <div className="cat-grid">
         {/* Form */}
-        <div style={{ background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '1.5rem' }}>
-          <h3 style={{ fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '1.25rem', fontWeight: 400 }}>
+        <div style={{ background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '1.25rem', fontWeight: 400 }}>
             {editing ? 'Edit Category' : 'Add Category'}
           </h3>
           {error && <p style={{ color: '#e05050', fontSize: '0.82rem', marginBottom: '1rem' }}>{error}</p>}
@@ -87,16 +87,16 @@ export default function AdminCategories() {
               <label style={labelStyle}>Sort Order</label>
               <input type="number" value={form.sort_order} onChange={set('sort_order')} style={inputStyle} min="0" />
             </div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--bone)', marginBottom: '1.25rem', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', marginBottom: '1.25rem', cursor: 'pointer' }}>
               <input type="checkbox" checked={form.is_active} onChange={set('is_active')} />
               Active (visible on store)
             </label>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button type="submit" disabled={saving} style={{ background: 'var(--brass)', color: 'var(--bone)', border: 'none', padding: '0.6rem 1.25rem', fontSize: '0.78rem', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
+              <button type="submit" disabled={saving} style={{ background: 'var(--brass)', color: 'var(--admin-text)', border: 'none', padding: '0.6rem 1.25rem', fontSize: '0.78rem', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
                 {saving ? 'Saving...' : (editing ? 'Update' : 'Add Category')}
               </button>
               {editing && (
-                <button type="button" onClick={cancelEdit} style={{ background: 'none', border: '1px solid #2a2a2d', color: 'var(--graphite-soft)', padding: '0.6rem 1rem', fontSize: '0.78rem', cursor: 'pointer' }}>
+                <button type="button" onClick={cancelEdit} style={{ background: 'none', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-muted)', padding: '0.6rem 1rem', fontSize: '0.78rem', cursor: 'pointer' }}>
                   Cancel
                 </button>
               )}
@@ -106,22 +106,22 @@ export default function AdminCategories() {
 
         {/* List */}
         <div>
-          {loading ? <p style={{ color: 'var(--graphite-soft)' }}>Loading...</p> : (
-            <div style={{ background: '#1a1a1c', border: '1px solid #2a2a2d', overflowX: 'auto' }}>
+          {loading ? <p style={{ color: 'var(--admin-text-muted)' }}>Loading...</p> : (
+            <div style={{ background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #2a2a2d' }}>
+                  <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
                     {['Name', 'Slug', 'Section', 'Order', 'Active', ''].map(h => (
-                      <th key={h} style={{ padding: '0.6rem 0.75rem', textAlign: 'left', color: 'var(--graphite-soft)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                      <th key={h} style={{ padding: '0.6rem 0.75rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {categories.map(c => (
-                    <tr key={c.id} style={{ borderBottom: '1px solid #1e1e20' }}>
+                    <tr key={c.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
                       <td style={{ padding: '0.7rem 0.75rem', fontWeight: 500 }}>{c.name}</td>
-                      <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>{c.slug}</td>
-                      <td style={{ padding: '0.7rem 0.75rem', color: 'var(--graphite-soft)' }}>{c.section}</td>
+                      <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{c.slug}</td>
+                      <td style={{ padding: '0.7rem 0.75rem', color: 'var(--admin-text-muted)' }}>{c.section}</td>
                       <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)' }}>{c.sort_order}</td>
                       <td style={{ padding: '0.7rem 0.75rem', color: c.is_active ? '#3a6b46' : '#a83232' }}>{c.is_active ? 'Yes' : 'No'}</td>
                       <td style={{ padding: '0.7rem 0.75rem' }}>
@@ -145,5 +145,5 @@ export default function AdminCategories() {
   )
 }
 
-const labelStyle = { display: 'block', fontSize: '0.7rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '0.3rem' }
-const inputStyle = { width: '100%', background: '#0e0e10', border: '1px solid #2a2a2d', color: 'var(--bone)', padding: '0.55rem 0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }
+const labelStyle = { display: 'block', fontSize: '0.7rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '0.3rem' }
+const inputStyle = { width: '100%', background: 'var(--admin-bg)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text)', padding: '0.55rem 0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }

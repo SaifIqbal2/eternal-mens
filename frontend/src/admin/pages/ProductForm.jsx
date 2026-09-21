@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { adminGetProduct, adminSaveProduct, adminGetCategories, adminUploadProductImage, adminDeleteProductImage, adminGetVariants, adminSaveVariant, adminDeleteVariant } from '../../lib/api'
 
@@ -180,11 +180,11 @@ export default function ProductForm() {
                 </select>
               </div>
               <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '1rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--bone)', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
                   <input type="checkbox" checked={form.is_featured} onChange={set('is_featured')} />
                   Featured
                 </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--bone)', cursor: 'pointer' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
                   <input type="checkbox" checked={form.is_bestseller} onChange={set('is_bestseller')} />
                   Bestseller
                 </label>
@@ -222,7 +222,7 @@ export default function ProductForm() {
             <section style={sectionStyle}>
               <h3 style={sectionTitle}>Images</h3>
               {!isNew && !productId && (
-                <p style={{ color: 'var(--graphite-soft)', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
+                <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
                   Save the product first to upload images.
                 </p>
               )}
@@ -234,7 +234,7 @@ export default function ProductForm() {
                       type="button"
                       onClick={() => handleDeleteImage(img)}
                       style={{ position: 'absolute', top: '2px', right: '2px', background: '#a83232', color: '#fff', border: 'none', width: '18px', height: '18px', fontSize: '10px', cursor: 'pointer', lineHeight: 1 }}
-                    >×</button>
+                    >Ã—</button>
                   </div>
                 ))}
               </div>
@@ -244,7 +244,7 @@ export default function ProductForm() {
                 multiple
                 onChange={handleImageUpload}
                 disabled={uploading || !productId}
-                style={{ fontSize: '0.8rem', color: 'var(--graphite-soft)' }}
+                style={{ fontSize: '0.8rem', color: 'var(--admin-text-muted)' }}
               />
               {uploading && <p style={{ color: 'var(--brass-soft)', fontSize: '0.8rem', marginTop: '0.5rem' }}>Uploading...</p>}
             </section>
@@ -259,21 +259,21 @@ export default function ProductForm() {
                   <div style={{ marginBottom: '1.25rem', overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
                       <thead>
-                        <tr style={{ borderBottom: '1px solid #2a2a2d' }}>
+                        <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
                           {['Name', 'Type', 'SKU', 'Price Override', 'Stock', 'Active', ''].map(h => (
-                            <th key={h} style={{ padding: '0.4rem 0.5rem', textAlign: 'left', color: 'var(--graphite-soft)', fontWeight: 400, fontSize: '0.65rem', textTransform: 'uppercase' }}>{h}</th>
+                            <th key={h} style={{ padding: '0.4rem 0.5rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.65rem', textTransform: 'uppercase' }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
                       <tbody>
                         {variants.map(v => (
-                          <tr key={v.id} style={{ borderBottom: '1px solid #1e1e20' }}>
+                          <tr key={v.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
                             <td style={{ padding: '0.4rem 0.5rem' }}>{v.name}</td>
-                            <td style={{ padding: '0.4rem 0.5rem', color: 'var(--graphite-soft)', fontSize: '0.75rem' }}>{v.option_type}</td>
-                            <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>{v.sku}</td>
-                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : '—'}</td>
+                            <td style={{ padding: '0.4rem 0.5rem', color: 'var(--admin-text-muted)', fontSize: '0.75rem' }}>{v.option_type}</td>
+                            <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{v.sku}</td>
+                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : 'â€”'}</td>
                             <td style={{ padding: '0.4rem 0.5rem' }}>{v.stock}</td>
-                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? '✓' : '✗'}</td>
+                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? 'âœ“' : 'âœ—'}</td>
                             <td style={{ padding: '0.4rem 0.5rem' }}>
                               <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <button type="button" onClick={() => startEditVariant(v)} style={{ background: 'none', border: 'none', color: 'var(--brass-soft)', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Edit</button>
@@ -288,7 +288,7 @@ export default function ProductForm() {
                 )}
 
                 {/* Add/Edit variant form */}
-                <form onSubmit={handleSaveVariant} style={{ background: '#0e0e10', padding: '1rem', border: '1px solid #2a2a2d' }}>
+                <form onSubmit={handleSaveVariant} style={{ background: 'var(--admin-bg)', padding: '1rem', border: '1px solid var(--admin-border-strong)' }}>
                   <p style={{ fontSize: '0.72rem', color: 'var(--brass-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
                     {editingVariant ? 'Edit Variant' : 'Add New Variant'}
                   </p>
@@ -320,18 +320,18 @@ export default function ProductForm() {
                       <input type="number" min="0" value={variantForm.stock} onChange={e => setVariantForm(f => ({ ...f, stock: e.target.value }))} style={inputStyle} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '0.2rem' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--bone)', cursor: 'pointer' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
                         <input type="checkbox" checked={variantForm.is_active} onChange={e => setVariantForm(f => ({ ...f, is_active: e.target.checked }))} />
                         Active
                       </label>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button type="submit" style={{ background: 'var(--brass)', color: 'var(--bone)', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
+                    <button type="submit" style={{ background: 'var(--brass)', color: 'var(--admin-text)', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
                       {editingVariant ? 'Update Variant' : 'Add Variant'}
                     </button>
                     {editingVariant && (
-                      <button type="button" onClick={() => { setEditingVariant(null); setVariantForm({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true }) }} style={{ background: 'none', border: '1px solid #2a2a2d', color: 'var(--graphite-soft)', padding: '0.5rem 1rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      <button type="button" onClick={() => { setEditingVariant(null); setVariantForm({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true }) }} style={{ background: 'none', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-muted)', padding: '0.5rem 1rem', fontSize: '0.75rem', cursor: 'pointer' }}>
                         Cancel
                       </button>
                     )}
@@ -343,10 +343,10 @@ export default function ProductForm() {
         </div>
 
         <div style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem' }}>
-          <button type="submit" disabled={saving} style={{ background: 'var(--brass)', color: 'var(--bone)', border: 'none', padding: '0.75rem 2rem', fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
+          <button type="submit" disabled={saving} style={{ background: 'var(--brass)', color: 'var(--admin-text)', border: 'none', padding: '0.75rem 2rem', fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
             {saving ? 'Saving...' : (isNew ? 'Create Product' : 'Save Changes')}
           </button>
-          <button type="button" onClick={() => navigate('/admin/products')} style={{ background: 'none', border: '1px solid #2a2a2d', color: 'var(--graphite-soft)', padding: '0.75rem 1.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>
+          <button type="button" onClick={() => navigate('/admin/products')} style={{ background: 'none', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-muted)', padding: '0.75rem 1.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>
             Cancel
           </button>
         </div>
@@ -361,7 +361,7 @@ export default function ProductForm() {
   )
 }
 
-const sectionStyle = { background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '1.25rem', marginBottom: '1.5rem' }
-const sectionTitle = { fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '1rem', fontWeight: 400 }
-const labelStyle = { display: 'block', fontSize: '0.75rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '0.35rem' }
-const inputStyle = { width: '100%', background: '#0e0e10', border: '1px solid #2a2a2d', color: 'var(--bone)', padding: '0.6rem 0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }
+const sectionStyle = { background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '1.25rem', marginBottom: '1.5rem' }
+const sectionTitle = { fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '1rem', fontWeight: 400 }
+const labelStyle = { display: 'block', fontSize: '0.75rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '0.35rem' }
+const inputStyle = { width: '100%', background: 'var(--admin-bg)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text)', padding: '0.6rem 0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }

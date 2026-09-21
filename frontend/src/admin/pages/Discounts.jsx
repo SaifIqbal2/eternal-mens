@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { adminGetDiscounts, adminSaveDiscount, adminDeleteDiscount } from '../../lib/api'
 
 const EMPTY = { code: '', type: 'PERCENTAGE', value: '', min_order_amount: '', usage_limit: '', starts_at: '', expires_at: '', is_active: true }
@@ -66,7 +66,7 @@ export default function AdminDiscounts() {
 
       <div className="disc-grid">
         {/* Form */}
-        <div style={{ background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '1.5rem', alignSelf: 'start' }}>
+        <div style={{ background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '1.5rem', alignSelf: 'start' }}>
           <h3 style={secTitle}>{editing ? 'Edit Discount' : 'Add Discount'}</h3>
           {error && <p style={{ color: '#e05050', fontSize: '0.82rem', marginBottom: '1rem' }}>{error}</p>}
           <form onSubmit={handleSave}>
@@ -83,42 +83,42 @@ export default function AdminDiscounts() {
             <div style={fg}><label style={lbl}>Usage Limit</label><input type="number" value={form.usage_limit} onChange={set('usage_limit')} style={inp} min="1" placeholder="Unlimited" /></div>
             <div style={fg}><label style={lbl}>Starts At</label><input type="datetime-local" value={form.starts_at} onChange={set('starts_at')} style={inp} /></div>
             <div style={fg}><label style={lbl}>Expires At</label><input type="datetime-local" value={form.expires_at} onChange={set('expires_at')} style={inp} /></div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--bone)', marginBottom: '1.25rem', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', marginBottom: '1.25rem', cursor: 'pointer' }}>
               <input type="checkbox" checked={form.is_active} onChange={set('is_active')} />
               Active
             </label>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button type="submit" disabled={saving} style={{ background: 'var(--brass)', color: 'var(--bone)', border: 'none', padding: '0.6rem 1.25rem', fontSize: '0.78rem', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
+              <button type="submit" disabled={saving} style={{ background: 'var(--brass)', color: 'var(--admin-text)', border: 'none', padding: '0.6rem 1.25rem', fontSize: '0.78rem', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
                 {saving ? 'Saving...' : (editing ? 'Update' : 'Create')}
               </button>
-              {editing && <button type="button" onClick={cancelEdit} style={{ background: 'none', border: '1px solid #2a2a2d', color: 'var(--graphite-soft)', padding: '0.6rem 1rem', fontSize: '0.78rem', cursor: 'pointer' }}>Cancel</button>}
+              {editing && <button type="button" onClick={cancelEdit} style={{ background: 'none', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-muted)', padding: '0.6rem 1rem', fontSize: '0.78rem', cursor: 'pointer' }}>Cancel</button>}
             </div>
           </form>
         </div>
 
         {/* List */}
         <div>
-          {loading ? <p style={{ color: 'var(--graphite-soft)' }}>Loading...</p> : (
+          {loading ? <p style={{ color: 'var(--admin-text-muted)' }}>Loading...</p> : (
             <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', background: '#1a1a1c', border: '1px solid #2a2a2d' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #2a2a2d' }}>
+                  <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
                     {['Code', 'Type', 'Value', 'Used', 'Active', 'Expires', ''].map(h => (
-                      <th key={h} style={{ padding: '0.6rem 0.75rem', textAlign: 'left', color: 'var(--graphite-soft)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                      <th key={h} style={{ padding: '0.6rem 0.75rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {discounts.length === 0 ? (
-                    <tr><td colSpan="7" style={{ padding: '2rem', color: 'var(--graphite-soft)', textAlign: 'center' }}>No discounts yet.</td></tr>
+                    <tr><td colSpan="7" style={{ padding: '2rem', color: 'var(--admin-text-muted)', textAlign: 'center' }}>No discounts yet.</td></tr>
                   ) : discounts.map(d => (
-                    <tr key={d.id} style={{ borderBottom: '1px solid #1e1e20' }}>
+                    <tr key={d.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
                       <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{d.code}</td>
-                      <td style={{ padding: '0.7rem 0.75rem', color: 'var(--graphite-soft)', fontSize: '0.75rem' }}>{d.type}</td>
+                      <td style={{ padding: '0.7rem 0.75rem', color: 'var(--admin-text-muted)', fontSize: '0.75rem' }}>{d.type}</td>
                       <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)' }}>{d.type === 'PERCENTAGE' ? `${d.value}%` : `Rs ${d.value}`}</td>
-                      <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--graphite-soft)' }}>{d.times_used}{d.usage_limit ? `/${d.usage_limit}` : ''}</td>
+                      <td style={{ padding: '0.7rem 0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--admin-text-muted)' }}>{d.times_used}{d.usage_limit ? `/${d.usage_limit}` : ''}</td>
                       <td style={{ padding: '0.7rem 0.75rem', color: d.is_active ? '#3a6b46' : '#a83232' }}>{d.is_active ? 'Yes' : 'No'}</td>
-                      <td style={{ padding: '0.7rem 0.75rem', fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>{d.expires_at ? new Date(d.expires_at).toLocaleDateString('en-PK') : '—'}</td>
+                      <td style={{ padding: '0.7rem 0.75rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{d.expires_at ? new Date(d.expires_at).toLocaleDateString('en-PK') : 'â€”'}</td>
                       <td style={{ padding: '0.7rem 0.75rem' }}>
                         <button onClick={() => startEdit(d)} style={{ background: 'none', border: 'none', color: 'var(--brass-soft)', fontSize: '0.75rem', cursor: 'pointer', marginRight: '0.5rem' }}>Edit</button>
                         <button onClick={() => handleDelete(d.id, d.code)} style={{ background: 'none', border: 'none', color: '#a83232', fontSize: '0.75rem', cursor: 'pointer' }}>Del</button>
@@ -140,7 +140,7 @@ export default function AdminDiscounts() {
   )
 }
 
-const secTitle = { fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '1.25rem', fontWeight: 400 }
+const secTitle = { fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '1.25rem', fontWeight: 400 }
 const fg = { marginBottom: '0.9rem' }
-const lbl = { display: 'block', fontSize: '0.7rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '0.3rem' }
-const inp = { width: '100%', background: '#0e0e10', border: '1px solid #2a2a2d', color: 'var(--bone)', padding: '0.55rem 0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }
+const lbl = { display: 'block', fontSize: '0.7rem', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '0.3rem' }
+const inp = { width: '100%', background: 'var(--admin-bg)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text)', padding: '0.55rem 0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }

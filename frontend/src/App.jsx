@@ -28,6 +28,8 @@ const AdminCategories = lazy(() => import('./admin/pages/Categories'))
 const AdminDiscounts = lazy(() => import('./admin/pages/Discounts'))
 const AdminMessages = lazy(() => import('./admin/pages/Messages'))
 const AdminCustomers = lazy(() => import('./admin/pages/Customers'))
+const AdminInventory = lazy(() => import('./admin/pages/Inventory'))
+const AdminReviews = lazy(() => import('./admin/pages/Reviews'))
 
 const LoadingFallback = () => (
   <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--graphite-soft)', fontSize: '0.9rem', letterSpacing: '0.05em' }}>
@@ -55,6 +57,8 @@ function App() {
             <Route path="discounts" element={<AdminDiscounts />} />
             <Route path="messages" element={<AdminMessages />} />
             <Route path="customers" element={<AdminCustomers />} />
+            <Route path="inventory" element={<AdminInventory />} />
+            <Route path="reviews" element={<AdminReviews />} />
           </Route>
 
           {/* Storefront Layout */}

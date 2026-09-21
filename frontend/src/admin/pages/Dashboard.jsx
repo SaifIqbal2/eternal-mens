@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { adminGetStats, adminGetOrders, adminGetProducts } from '../../lib/api'
 
 function StatCard({ label, value, color }) {
   return (
-    <div style={{ background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '1.25rem' }}>
-      <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '0.5rem' }}>{label}</div>
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.75rem', color: color || 'var(--bone)' }}>{value}</div>
+    <div style={{ background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '1.25rem' }}>
+      <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '0.5rem' }}>{label}</div>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.75rem', color: color || 'var(--admin-text)' }}>{value}</div>
     </div>
   )
 }
@@ -34,7 +34,7 @@ export default function Dashboard() {
     }).catch(console.error).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p style={{ color: 'var(--graphite-soft)' }}>Loading dashboard...</p>
+  if (loading) return <p style={{ color: 'var(--admin-text-muted)' }}>Loading dashboard...</p>
 
   return (
     <div>
@@ -55,26 +55,26 @@ export default function Dashboard() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }} className="dash-panels">
         {/* Recent Orders */}
-        <div style={{ background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '1.5rem' }}>
+        <div style={{ background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1rem', fontWeight: 500 }}>Recent Orders</h2>
             <Link to="/admin/orders" style={{ fontSize: '0.75rem', color: 'var(--brass-soft)', textDecoration: 'underline' }}>View All</Link>
           </div>
           {recentOrders.length === 0 ? (
-            <p style={{ color: 'var(--graphite-soft)', fontSize: '0.85rem' }}>No orders yet.</p>
+            <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>No orders yet.</p>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                 <thead>
-                  <tr style={{ borderBottom: '1px solid #2a2a2d' }}>
+                  <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
                     {['Order', 'Customer', 'Total', 'Status', ''].map(h => (
-                      <th key={h} style={{ padding: '0.6rem 0.5rem', textAlign: 'left', color: 'var(--graphite-soft)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
+                      <th key={h} style={{ padding: '0.6rem 0.5rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {recentOrders.map(o => (
-                    <tr key={o.id} style={{ borderBottom: '1px solid #1e1e20' }}>
+                    <tr key={o.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
                       <td style={{ padding: '0.7rem 0.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.78rem' }}>{o.order_number}</td>
                       <td style={{ padding: '0.7rem 0.5rem' }}>{o.customer_name}</td>
                       <td style={{ padding: '0.7rem 0.5rem', fontFamily: 'var(--font-mono)' }}>Rs {Number(o.total).toLocaleString()}</td>
@@ -95,19 +95,19 @@ export default function Dashboard() {
         </div>
 
         {/* Low Stock */}
-        <div style={{ background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '1.5rem' }}>
+        <div style={{ background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1rem', fontWeight: 500 }}>Low Stock Alerts</h2>
             <Link to="/admin/products" style={{ fontSize: '0.75rem', color: 'var(--brass-soft)', textDecoration: 'underline' }}>Manage</Link>
           </div>
           {lowStock.length === 0 ? (
-            <p style={{ color: 'var(--graphite-soft)', fontSize: '0.85rem' }}>All stocked up! ✓</p>
+            <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.85rem' }}>All stocked up! âœ“</p>
           ) : (
             lowStock.map(p => (
-              <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0', borderBottom: '1px solid #1e1e20' }}>
+              <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0', borderBottom: '1px solid var(--admin-border)' }}>
                 <div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 500 }}>{p.name}</div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--graphite-soft)', fontFamily: 'var(--font-mono)' }}>{p.sku}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--admin-text-muted)', fontFamily: 'var(--font-mono)' }}>{p.sku}</div>
                 </div>
                 <span style={{ fontSize: '0.75rem', color: p.stock === 0 ? '#a83232' : '#c9a96a', fontFamily: 'var(--font-mono)' }}>
                   {p.stock === 0 ? 'OUT' : `${p.stock} left`}

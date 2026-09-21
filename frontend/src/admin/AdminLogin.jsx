@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { adminLogin } from '../lib/api'
 
@@ -29,19 +29,19 @@ export default function AdminLogin() {
       background: 'var(--ink)', fontFamily: 'var(--font-sans)'
     }}>
       <div style={{
-        background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '2.5rem',
+        background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '2.5rem',
         width: '100%', maxWidth: '400px'
       }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--bone)', fontSize: '1.75rem', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', color: 'var(--admin-text)', fontSize: '1.75rem', marginBottom: '0.5rem' }}>
           ETERNAL MENS
         </h1>
-        <p style={{ color: 'var(--graphite-soft)', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '2rem' }}>
+        <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '2rem' }}>
           Admin Panel
         </p>
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', color: 'var(--bone)', fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+            <label style={{ display: 'block', color: 'var(--admin-text)', fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
               Email
             </label>
             <input
@@ -49,12 +49,12 @@ export default function AdminLogin() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              style={{ width: '100%', background: '#0e0e10', border: '1px solid #2a2a2d', color: 'var(--bone)', padding: '0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.9rem' }}
+              style={{ width: '100%', background: 'var(--admin-bg)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text)', padding: '0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.9rem' }}
             />
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', color: 'var(--bone)', fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+            <label style={{ display: 'block', color: 'var(--admin-text)', fontSize: '0.75rem', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
               Password
             </label>
             <input
@@ -62,7 +62,7 @@ export default function AdminLogin() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              style={{ width: '100%', background: '#0e0e10', border: '1px solid #2a2a2d', color: 'var(--bone)', padding: '0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.9rem' }}
+              style={{ width: '100%', background: 'var(--admin-bg)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text)', padding: '0.75rem', fontFamily: 'var(--font-sans)', fontSize: '0.9rem' }}
             />
           </div>
 
@@ -73,7 +73,7 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            style={{ width: '100%', background: 'var(--brass)', color: 'var(--bone)', border: 'none', padding: '0.9rem', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}
+            style={{ width: '100%', background: 'var(--brass)', color: 'var(--admin-text)', border: 'none', padding: '0.9rem', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>

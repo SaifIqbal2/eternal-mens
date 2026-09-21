@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { adminGetOrder, adminUpdateOrderStatus } from '../../lib/api'
 
@@ -36,14 +36,14 @@ export default function OrderDetail() {
     }
   }
 
-  if (loading) return <p style={{ color: 'var(--graphite-soft)' }}>Loading order...</p>
+  if (loading) return <p style={{ color: 'var(--admin-text-muted)' }}>Loading order...</p>
   if (!order) return null
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        <button onClick={() => navigate('/admin/orders')} style={{ background: 'none', border: '1px solid #2a2a2d', color: 'var(--graphite-soft)', padding: '0.4rem 0.75rem', fontSize: '0.75rem', cursor: 'pointer' }}>
-          ← Back
+        <button onClick={() => navigate('/admin/orders')} style={{ background: 'none', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-muted)', padding: '0.4rem 0.75rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+          â† Back
         </button>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>
           Order {order.order_number}
@@ -81,20 +81,20 @@ export default function OrderDetail() {
           <div style={card}>
             <h3 style={cardTitle}>Order Items</h3>
             {order.items?.map(item => (
-              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.6rem 0', borderBottom: '1px solid #1e1e20', fontSize: '0.85rem' }}>
+              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.6rem 0', borderBottom: '1px solid var(--admin-border)', fontSize: '0.85rem' }}>
                 <div>
                   <div style={{ fontWeight: 500 }}>{item.product_name}</div>
-                  {item.variant_name && <div style={{ color: 'var(--graphite-soft)', fontSize: '0.75rem' }}>{item.variant_name}</div>}
-                  <div style={{ color: 'var(--graphite-soft)', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>{item.sku} × {item.quantity}</div>
+                  {item.variant_name && <div style={{ color: 'var(--admin-text-muted)', fontSize: '0.75rem' }}>{item.variant_name}</div>}
+                  <div style={{ color: 'var(--admin-text-muted)', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>{item.sku} Ã— {item.quantity}</div>
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}>
                   Rs {Number(item.line_total).toLocaleString()}
                 </div>
               </div>
             ))}
-            <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid #2a2a2d', fontSize: '0.85rem' }}>
+            <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--admin-border-strong)', fontSize: '0.85rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                <span style={{ color: 'var(--graphite-soft)' }}>Subtotal</span>
+                <span style={{ color: 'var(--admin-text-muted)' }}>Subtotal</span>
                 <span className="mono">Rs {Number(order.subtotal).toLocaleString()}</span>
               </div>
               {order.discount_amount > 0 && (
@@ -104,10 +104,10 @@ export default function OrderDetail() {
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                <span style={{ color: 'var(--graphite-soft)' }}>Shipping</span>
+                <span style={{ color: 'var(--admin-text-muted)' }}>Shipping</span>
                 <span className="mono">{order.shipping_cost > 0 ? `Rs ${Number(order.shipping_cost).toLocaleString()}` : 'Free'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, borderTop: '1px solid #2a2a2d', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, borderTop: '1px solid var(--admin-border-strong)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
                 <span>Total</span>
                 <span className="mono">Rs {Number(order.total).toLocaleString()}</span>
               </div>
@@ -119,22 +119,22 @@ export default function OrderDetail() {
             <select
               value={status}
               onChange={e => setStatus(e.target.value)}
-              style={{ width: '100%', background: '#0e0e10', border: '1px solid #2a2a2d', color: 'var(--bone)', padding: '0.6rem', marginBottom: '0.75rem', fontSize: '0.85rem' }}
+              style={{ width: '100%', background: 'var(--admin-bg)', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text)', padding: '0.6rem', marginBottom: '0.75rem', fontSize: '0.85rem' }}
             >
               {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
             <button
               onClick={handleStatusUpdate}
               disabled={saving}
-              style={{ width: '100%', background: 'var(--brass)', color: 'var(--bone)', border: 'none', padding: '0.7rem', fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}
+              style={{ width: '100%', background: 'var(--brass)', color: 'var(--admin-text)', border: 'none', padding: '0.7rem', fontSize: '0.8rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}
             >
               {saving ? 'Saving...' : 'Update Status'}
             </button>
           </div>
 
-          <div style={{ ...card, fontSize: '0.78rem', color: 'var(--graphite-soft)' }}>
-            <p><strong style={{ color: 'var(--bone)' }}>Placed:</strong> {new Date(order.created_at).toLocaleString('en-PK')}</p>
-            <p style={{ marginTop: '0.3rem' }}><strong style={{ color: 'var(--bone)' }}>Updated:</strong> {new Date(order.updated_at).toLocaleString('en-PK')}</p>
+          <div style={{ ...card, fontSize: '0.78rem', color: 'var(--admin-text-muted)' }}>
+            <p><strong style={{ color: 'var(--admin-text)' }}>Placed:</strong> {new Date(order.created_at).toLocaleString('en-PK')}</p>
+            <p style={{ marginTop: '0.3rem' }}><strong style={{ color: 'var(--admin-text)' }}>Updated:</strong> {new Date(order.updated_at).toLocaleString('en-PK')}</p>
           </div>
         </div>
       </div>
@@ -147,6 +147,6 @@ export default function OrderDetail() {
   )
 }
 
-const card = { background: '#1a1a1c', border: '1px solid #2a2a2d', padding: '1.25rem', marginBottom: '1rem' }
-const cardTitle = { fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--graphite-soft)', marginBottom: '0.75rem', fontWeight: 400 }
+const card = { background: 'var(--admin-bg-sec)', border: '1px solid var(--admin-border-strong)', padding: '1.25rem', marginBottom: '1rem' }
+const cardTitle = { fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--admin-text-muted)', marginBottom: '0.75rem', fontWeight: 400 }
 const infoRow = { fontSize: '0.85rem', marginBottom: '0.35rem', lineHeight: 1.5 }

@@ -61,7 +61,7 @@ export default function ProductDetails() {
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : 0
 
-  const reviews = product.reviews || []
+  const reviews = (product.reviews || []).filter(r => r.is_approved)
   const avgRating = reviews.length > 0
     ? Math.round(reviews.reduce((s, r) => s + r.rating, 0) / reviews.length)
     : 0
@@ -254,7 +254,6 @@ export default function ProductDetails() {
               {reviews.map(r => (
                 <div key={r.id} className="review-card">
                   <div className="review-stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
-                  {r.title && <p style={{ fontWeight: 600, marginBottom: '0.4rem' }}>{r.title}</p>}
                   <p>{r.body}</p>
                   <p className="review-author">{r.author_name}</p>
                 </div>
@@ -376,7 +375,6 @@ function ReviewForm({ productSlug, productId }) {
         product_id: productId,
         author_name: name,
         rating: Number(rating),
-        title: fd.get('title')?.trim() || null,
         body,
         is_approved: false,
       })
@@ -428,10 +426,6 @@ function ReviewForm({ productSlug, productId }) {
             <option value="1">★☆☆☆☆ Poor</option>
           </select>
         </div>
-      </div>
-      <div className="form-group">
-        <label>Review Title (optional)</label>
-        <input type="text" name="title" />
       </div>
       <div className="form-group">
         <label>Your Review</label>
