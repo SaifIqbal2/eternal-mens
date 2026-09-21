@@ -14,8 +14,8 @@ export default function Header() {
     <header className="site-header">
       <div className="container header-inner">
 
-        <Link to="/" className="logo" onClick={closeMenu}>
-          <img src="/assets/images/logo.png" alt="Eternal Mens" className="logo-mark" style={{ height: '36px', width: 'auto' }} />
+        <Link to="/" className="logo" onClick={closeMenu} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '1.85rem', fontWeight: 700 }}>
+          <img src="/assets/images/logo.png" alt="Eternal Mens" className="logo-mark" style={{ height: '40px', width: 'auto' }} />
           <span>ETERNAL MENS</span>
         </Link>
 
