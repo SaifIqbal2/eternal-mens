@@ -327,16 +327,20 @@ export default function ProductForm() {
                         <tbody>
                           {variants.map(v => (
                             <tr key={v.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
-                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.name}</td>
-                              <td style={{ padding: '0.4rem 0.5rem', color: 'var(--admin-text-muted)', fontSize: '0.75rem' }}>{v.option_type}</td>
-                              <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{v.sku}</td>
-                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : '-'}</td>
-                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.stock}</td>
-                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? 'Yes' : 'No'}</td>
-                              <td style={{ padding: '0.4rem 0.5rem' }}>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                  <button type="button" onClick={() => startEditVariant(v)} style={{ background: 'none', border: 'none', color: 'var(--brass-soft)', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Edit</button>
-                                  <button type="button" onClick={() => handleDeleteVariant(v.id)} style={{ background: 'none', border: 'none', color: '#a83232', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Del</button>
+                              <td style={{ padding: '0.5rem 0.5rem', fontWeight: 500 }}>{v.name}</td>
+                              <td style={{ padding: '0.5rem 0.5rem', color: 'var(--admin-text-muted)', fontSize: '0.75rem', textTransform: 'capitalize' }}>{v.option_type}</td>
+                              <td style={{ padding: '0.5rem 0.5rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{v.sku || '—'}</td>
+                              <td style={{ padding: '0.5rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : '—'}</td>
+                              <td style={{ padding: '0.5rem 0.5rem' }}>{v.stock}</td>
+                              <td style={{ padding: '0.5rem 0.5rem' }}>
+                                <span style={{ display: 'inline-block', padding: '0.15rem 0.4rem', fontSize: '0.65rem', background: v.is_active ? '#dcfce7' : '#fee2e2', color: v.is_active ? '#166534' : '#991b1b', borderRadius: '3px' }}>
+                                  {v.is_active ? 'Active' : 'Off'}
+                                </span>
+                              </td>
+                              <td style={{ padding: '0.5rem 0.5rem' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                  <button type="button" onClick={() => startEditVariant(v)} style={{ background: 'var(--admin-bg)', border: '1px solid var(--admin-border-strong)', color: 'var(--brass-soft)', fontSize: '0.7rem', cursor: 'pointer', padding: '0.25rem 0.6rem', letterSpacing: '0.04em' }}>Edit</button>
+                                  <button type="button" onClick={() => handleDeleteVariant(v.id)} style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', fontSize: '0.7rem', cursor: 'pointer', padding: '0.25rem 0.6rem', letterSpacing: '0.04em' }}>🗑 Delete</button>
                                 </div>
                               </td>
                             </tr>
