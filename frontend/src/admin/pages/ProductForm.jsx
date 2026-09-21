@@ -29,6 +29,7 @@ export default function ProductForm() {
   const [variants, setVariants] = useState([])
   const [variantForm, setVariantForm] = useState({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true })
   const [editingVariant, setEditingVariant] = useState(null)
+  const [pendingImages, setPendingImages] = useState([]) // files selected before product saved
 
   useEffect(() => {
     adminGetCategories().then(setCategories).catch(console.error)
@@ -69,18 +70,35 @@ export default function ProductForm() {
       if (!isNew) payload.id = productId
       const saved = await adminSaveProduct(payload)
       setProductId(saved.id)
+      // Upload any pending images that were selected before save
+      if (pendingImages.length > 0) {
+        setUploading(true)
+        for (const file of pendingImages) {
+          const img = await adminUploadProductImage(saved.id, file)
+          setImages(prev => [...prev, img])
+        }
+        setPendingImages([])
+        setUploading(false)
+      }
       if (isNew) navigate(`/admin/products/${saved.id}`, { replace: true })
       else alert('Saved!')
     } catch (e) {
       setError(e.message)
+      setUploading(false)
     } finally {
       setSaving(false)
     }
   }
 
   const handleImageUpload = async (e) => {
-    if (!productId) { alert('Save the product first, then upload images.'); return }
     const files = Array.from(e.target.files)
+    if (!files.length) return
+    // If product not saved yet, store files as pending
+    if (!productId) {
+      setPendingImages(prev => [...prev, ...files])
+      return
+    }
+    // Existing product — upload immediately
     setUploading(true)
     try {
       for (const file of files) {
@@ -221,43 +239,61 @@ export default function ProductForm() {
             {/* Images */}
             <section style={sectionStyle}>
               <h3 style={sectionTitle}>Images</h3>
-              {!productId ? (
-                <div style={{ background: '#fff8e1', border: '1px solid #f59e0b', padding: '0.75rem 1rem', borderRadius: '4px', marginBottom: '0.75rem' }}>
-                  <p style={{ color: '#92400e', fontSize: '0.82rem', margin: 0 }}>
-                    ⚠ First save the product (click "Create Product"), then you can upload images.
-                  </p>
+
+              {/* Saved images */}
+              {images.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+                  {images.map(img => (
+                    <div key={img.id} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                      <img src={img.url} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteImage(img)}
+                        style={{ position: 'absolute', top: '2px', right: '2px', background: '#a83232', color: '#fff', border: 'none', width: '18px', height: '18px', fontSize: '10px', cursor: 'pointer', lineHeight: 1 }}
+                      >&times;</button>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-                    {images.map(img => (
-                      <div key={img.id} style={{ position: 'relative', width: '80px', height: '80px' }}>
-                        <img src={img.url} alt="product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              )}
+
+              {/* Pending images (selected but not yet saved) */}
+              {pendingImages.length > 0 && (
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--admin-text-muted)', marginBottom: '0.4rem' }}>
+                    {pendingImages.length} image(s) queued — will upload when you save:
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {pendingImages.map((f, i) => (
+                      <div key={i} style={{ position: 'relative', width: '80px', height: '80px', background: '#e2e8f0', overflow: 'hidden' }}>
+                        <img src={URL.createObjectURL(f)} alt={f.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         <button
                           type="button"
-                          onClick={() => handleDeleteImage(img)}
-                          style={{ position: 'absolute', top: '2px', right: '2px', background: '#a83232', color: '#fff', border: 'none', width: '18px', height: '18px', fontSize: '10px', cursor: 'pointer', lineHeight: 1 }}
+                          onClick={() => setPendingImages(prev => prev.filter((_, idx) => idx !== i))}
+                          style={{ position: 'absolute', top: '2px', right: '2px', background: '#64748b', color: '#fff', border: 'none', width: '18px', height: '18px', fontSize: '10px', cursor: 'pointer', lineHeight: 1 }}
                         >&times;</button>
                       </div>
                     ))}
                   </div>
-                  <label style={{ display: 'inline-block', cursor: 'pointer' }}>
-                    <span style={{ background: 'var(--brass)', color: '#fff', padding: '0.5rem 1.25rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'inline-block' }}>
-                      {uploading ? 'Uploading...' : '+ Upload Images'}
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageUpload}
-                      disabled={uploading}
-                      style={{ display: 'none' }}
-                    />
-                  </label>
-                  {images.length === 0 && !uploading && (
-                    <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.8rem', marginTop: '0.5rem' }}>No images yet.</p>
-                  )}
-                </>
+                </div>
+              )}
+
+              <label style={{ display: 'inline-block', cursor: uploading ? 'not-allowed' : 'pointer' }}>
+                <span style={{ background: uploading ? '#94a3b8' : 'var(--brass)', color: '#fff', padding: '0.5rem 1.25rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'inline-block' }}>
+                  {uploading ? 'Uploading...' : '+ Add Images'}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              {isNew && pendingImages.length === 0 && images.length === 0 && (
+                <p style={{ color: 'var(--admin-text-muted)', fontSize: '0.78rem', marginTop: '0.5rem' }}>
+                  Select images now — they will be uploaded automatically when you save the product.
+                </p>
               )}
             </section>
 
