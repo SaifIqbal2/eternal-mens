@@ -59,7 +59,7 @@ export default function Home() {
   }
 
   // Arrivals Carousel Navigation
-  const ARRIVALS_PER_PAGE = typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 4
+  const getArrivalsPerPage = () => typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 4
 
   const prevArrivals = () => {
     if (newArrivals.length === 0) return
@@ -68,7 +68,9 @@ export default function Home() {
 
   const nextArrivals = () => {
     if (newArrivals.length === 0) return
-    setArrivalsIndex((i) => Math.min(newArrivals.length - 1, i + 1))
+    const perPage = getArrivalsPerPage()
+    const maxIndex = Math.max(0, newArrivals.length - perPage)
+    setArrivalsIndex((i) => Math.min(maxIndex, i + 1))
   }
 
   const activeFeatured = featuredPieces[featuredIndex]
@@ -359,9 +361,9 @@ export default function Home() {
               </div>
 
               <div className="new-arrivals-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
-                <span className="mono">{String(arrivalsIndex + 1).padStart(2, '0')}</span>
+                <span className="mono">{String(arrivalsIndex + getArrivalsPerPage()).padStart(2, '0')}</span>
                 <span className="new-arrivals-progress" style={{ width: '120px', height: '2px', background: '#dcd8cf', position: 'relative', display: 'inline-block' }}>
-                  <i style={{ position: 'absolute', top: 0, left: 0, height: '100%', background: 'var(--brass)', width: `${((arrivalsIndex + 1) / newArrivals.length) * 100}%` }}></i>
+                  <i style={{ position: 'absolute', top: 0, left: 0, height: '100%', background: 'var(--brass)', width: `${(Math.min(newArrivals.length, arrivalsIndex + getArrivalsPerPage()) / Math.max(1, newArrivals.length)) * 100}%` }}></i>
                 </span>
                 <span className="mono">{String(newArrivals.length).padStart(2, '0')}</span>
               </div>
