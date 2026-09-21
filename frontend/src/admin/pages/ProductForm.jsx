@@ -381,7 +381,7 @@ export default function ProductForm() {
                   )}
 
                   {/* Add/Edit variant form */}
-                  <form onSubmit={handleSaveVariant} style={{ background: 'var(--admin-bg)', padding: '1rem', border: '1px solid var(--admin-border-strong)' }}>
+                  <div style={{ background: 'var(--admin-bg)', padding: '1rem', border: '1px solid var(--admin-border-strong)' }}>
                     <p style={{ fontSize: '0.72rem', color: 'var(--brass-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
                       {editingVariant ? 'Edit Variant' : 'Add New Variant'}
                     </p>
@@ -421,7 +421,7 @@ export default function ProductForm() {
                     </div>
                     {variantError && <div style={{ color: '#e05050', fontSize: '0.75rem', marginBottom: '0.75rem' }}>{variantError}</div>}
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button type="submit" style={{ background: 'var(--brass)', color: '#fff', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
+                      <button type="button" onClick={handleSaveVariant} style={{ background: 'var(--brass)', color: '#fff', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
                         {editingVariant ? 'Update Variant' : 'Add Variant'}
                       </button>
                       {editingVariant && (
@@ -430,7 +430,7 @@ export default function ProductForm() {
                         </button>
                       )}
                     </div>
-                  </form>
+                  </div>
                 </>
               )}
             </section>
