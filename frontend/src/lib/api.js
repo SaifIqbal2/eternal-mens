@@ -348,6 +348,13 @@ export async function adminUpdateOrderStatus(id, status) {
   if (error) throw error
 }
 
+export async function adminDeleteOrder(id) {
+  // Delete order items first, then the order
+  await supabase.from('order_items').delete().eq('order_id', id)
+  const { error } = await supabase.from('orders').delete().eq('id', id)
+  if (error) throw error
+}
+
 // ─── ADMIN — CATEGORIES ──────────────────────────────────────
 
 export async function adminGetCategories() {
@@ -454,4 +461,34 @@ export async function adminGetStats() {
     outOfStock:      products.filter(p => p.stock === 0).length,
     totalCustomers:  customersRes.count || 0,
   }
+}
+
+// ─── ADMIN — PRODUCT VARIANTS ────────────────────────────────
+
+export async function adminGetVariants(productId) {
+  const { data, error } = await supabase
+    .from('product_variants')
+    .select('*')
+    .eq('product_id', productId)
+    .order('id')
+  if (error) throw error
+  return data || []
+}
+
+export async function adminSaveVariant(variant) {
+  if (variant.id) {
+    const { id, ...fields } = variant
+    const { data, error } = await supabase.from('product_variants').update(fields).eq('id', id).select().single()
+    if (error) throw error
+    return data
+  } else {
+    const { data, error } = await supabase.from('product_variants').insert(variant).select().single()
+    if (error) throw error
+    return data
+  }
+}
+
+export async function adminDeleteVariant(id) {
+  const { error } = await supabase.from('product_variants').delete().eq('id', id)
+  if (error) throw error
 }

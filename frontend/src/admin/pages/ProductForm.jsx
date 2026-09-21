@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { adminGetProduct, adminSaveProduct, adminGetCategories, adminUploadProductImage, adminDeleteProductImage } from '../../lib/api'
+import { adminGetProduct, adminSaveProduct, adminGetCategories, adminUploadProductImage, adminDeleteProductImage, adminGetVariants, adminSaveVariant, adminDeleteVariant } from '../../lib/api'
 
 const EMPTY = {
   name: '', slug: '', sku: '', brand: '', category_id: '',
@@ -26,14 +26,18 @@ export default function ProductForm() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [productId, setProductId] = useState(null)
+  const [variants, setVariants] = useState([])
+  const [variantForm, setVariantForm] = useState({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true })
+  const [editingVariant, setEditingVariant] = useState(null)
 
   useEffect(() => {
     adminGetCategories().then(setCategories).catch(console.error)
     if (!isNew) {
       adminGetProduct(id).then(p => {
-        const { images: imgs, variants, category, ...rest } = p
+        const { images: imgs, variants: vars, category, ...rest } = p
         setForm({ ...EMPTY, ...rest })
         setImages(imgs || [])
+        setVariants(vars || [])
         setProductId(p.id)
       }).catch(() => setError('Product not found'))
     }
@@ -98,6 +102,36 @@ export default function ProductForm() {
     } catch (e) {
       alert('Error: ' + e.message)
     }
+  }
+
+  const handleSaveVariant = async (e) => {
+    e.preventDefault()
+    if (!productId) { alert('Save the product first before adding variants.'); return }
+    try {
+      const payload = { ...variantForm, product_id: productId, price_override: variantForm.price_override ? Number(variantForm.price_override) : null, stock: Number(variantForm.stock) }
+      if (editingVariant) payload.id = editingVariant
+      const saved = await adminSaveVariant(payload)
+      if (editingVariant) {
+        setVariants(prev => prev.map(v => v.id === saved.id ? saved : v))
+      } else {
+        setVariants(prev => [...prev, saved])
+      }
+      setVariantForm({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true })
+      setEditingVariant(null)
+    } catch (e) { alert('Error: ' + e.message) }
+  }
+
+  const handleDeleteVariant = async (id) => {
+    if (!confirm('Delete this variant?')) return
+    try {
+      await adminDeleteVariant(id)
+      setVariants(prev => prev.filter(v => v.id !== id))
+    } catch (e) { alert('Error: ' + e.message) }
+  }
+
+  const startEditVariant = (v) => {
+    setVariantForm({ name: v.name, option_type: v.option_type || 'color', sku: v.sku || '', price_override: v.price_override || '', stock: v.stock || 0, is_active: v.is_active !== false })
+    setEditingVariant(v.id)
   }
 
   const field = (label, key, type = 'text', props = {}) => (
@@ -214,6 +248,97 @@ export default function ProductForm() {
               />
               {uploading && <p style={{ color: 'var(--brass-soft)', fontSize: '0.8rem', marginTop: '0.5rem' }}>Uploading...</p>}
             </section>
+
+            {/* Variants */}
+            {!isNew && (
+              <section style={sectionStyle}>
+                <h3 style={sectionTitle}>Variants (Color / Size / etc.)</h3>
+
+                {/* Existing variants table */}
+                {variants.length > 0 && (
+                  <div style={{ marginBottom: '1.25rem', overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid #2a2a2d' }}>
+                          {['Name', 'Type', 'SKU', 'Price Override', 'Stock', 'Active', ''].map(h => (
+                            <th key={h} style={{ padding: '0.4rem 0.5rem', textAlign: 'left', color: 'var(--graphite-soft)', fontWeight: 400, fontSize: '0.65rem', textTransform: 'uppercase' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {variants.map(v => (
+                          <tr key={v.id} style={{ borderBottom: '1px solid #1e1e20' }}>
+                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.name}</td>
+                            <td style={{ padding: '0.4rem 0.5rem', color: 'var(--graphite-soft)', fontSize: '0.75rem' }}>{v.option_type}</td>
+                            <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--graphite-soft)' }}>{v.sku}</td>
+                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : '—'}</td>
+                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.stock}</td>
+                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? '✓' : '✗'}</td>
+                            <td style={{ padding: '0.4rem 0.5rem' }}>
+                              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button type="button" onClick={() => startEditVariant(v)} style={{ background: 'none', border: 'none', color: 'var(--brass-soft)', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Edit</button>
+                                <button type="button" onClick={() => handleDeleteVariant(v.id)} style={{ background: 'none', border: 'none', color: '#a83232', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Del</button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {/* Add/Edit variant form */}
+                <form onSubmit={handleSaveVariant} style={{ background: '#0e0e10', padding: '1rem', border: '1px solid #2a2a2d' }}>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--brass-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
+                    {editingVariant ? 'Edit Variant' : 'Add New Variant'}
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                    <div>
+                      <label style={labelStyle}>Variant Name *</label>
+                      <input required value={variantForm.name} onChange={e => setVariantForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Black, Large" style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Option Type</label>
+                      <select value={variantForm.option_type} onChange={e => setVariantForm(f => ({ ...f, option_type: e.target.value }))} style={inputStyle}>
+                        <option value="color">Color</option>
+                        <option value="size">Size</option>
+                        <option value="material">Material</option>
+                        <option value="style">Style</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style={labelStyle}>SKU</label>
+                      <input value={variantForm.sku} onChange={e => setVariantForm(f => ({ ...f, sku: e.target.value }))} style={inputStyle} />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Price Override (Rs)</label>
+                      <input type="number" min="0" value={variantForm.price_override} onChange={e => setVariantForm(f => ({ ...f, price_override: e.target.value }))} style={inputStyle} placeholder="Leave blank to use product price" />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Stock</label>
+                      <input type="number" min="0" value={variantForm.stock} onChange={e => setVariantForm(f => ({ ...f, stock: e.target.value }))} style={inputStyle} />
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '0.2rem' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--bone)', cursor: 'pointer' }}>
+                        <input type="checkbox" checked={variantForm.is_active} onChange={e => setVariantForm(f => ({ ...f, is_active: e.target.checked }))} />
+                        Active
+                      </label>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button type="submit" style={{ background: 'var(--brass)', color: 'var(--bone)', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
+                      {editingVariant ? 'Update Variant' : 'Add Variant'}
+                    </button>
+                    {editingVariant && (
+                      <button type="button" onClick={() => { setEditingVariant(null); setVariantForm({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true }) }} style={{ background: 'none', border: '1px solid #2a2a2d', color: 'var(--graphite-soft)', padding: '0.5rem 1rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </section>
+            )}
           </div>
         </div>
 

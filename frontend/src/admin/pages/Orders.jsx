@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { adminGetOrders } from '../../lib/api'
+import { adminGetOrders, adminDeleteOrder } from '../../lib/api'
 
 const STATUS_COLORS = {
   PENDING: '#c9a96a', CONFIRMED: '#6a9acf', PROCESSING: '#6a9acf',
@@ -23,6 +23,16 @@ export default function AdminOrders() {
     o.customer_name?.toLowerCase().includes(search.toLowerCase()) ||
     o.customer_phone?.includes(search)
   )
+
+  const handleDelete = async (id, orderNum) => {
+    if (!confirm(`Delete order ${orderNum}? This cannot be undone.`)) return
+    try {
+      await adminDeleteOrder(id)
+      setOrders(prev => prev.filter(o => o.id !== id))
+    } catch (e) {
+      alert('Error: ' + e.message)
+    }
+  }
 
   return (
     <div>
@@ -79,7 +89,10 @@ export default function AdminOrders() {
                     {new Date(o.created_at).toLocaleDateString('en-PK')}
                   </td>
                   <td style={{ padding: '0.7rem 0.5rem' }}>
-                    <Link to={`/admin/orders/${o.id}`} style={{ color: 'var(--brass-soft)', fontSize: '0.75rem' }}>View</Link>
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                      <Link to={`/admin/orders/${o.id}`} style={{ color: 'var(--brass-soft)', fontSize: '0.75rem' }}>View</Link>
+                      <button onClick={() => handleDelete(o.id, o.order_number)} style={{ background: 'none', border: 'none', fontSize: '0.75rem', color: '#a83232', cursor: 'pointer', padding: 0 }}>Delete</button>
+                    </div>
                   </td>
                 </tr>
               ))}

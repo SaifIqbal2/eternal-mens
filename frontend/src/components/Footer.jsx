@@ -14,7 +14,7 @@ export default function Footer() {
         <nav className="footer-col">
           <Link to="/collection?section=watches">Watches</Link>
           <Link to="/collection?section=accessories">Accessories</Link>
-          <Link to="/collection">New Arrivals</Link>
+          <Link to="/collection?sort=newest">New Arrivals</Link>
           <Link to="/order-tracking">Order Tracking</Link>
           <Link to="/returns">Exchange &amp; Returns</Link>
           <Link to="/shipping">Shipping &amp; Deliveries</Link>

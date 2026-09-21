@@ -1,19 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { getFeaturedPieces, getBestsellers, getNewArrivals, subscribeNewsletter } from '../lib/api'
+import { getFeaturedPieces, getBestsellers, getNewArrivals, subscribeNewsletter, getCategories } from '../lib/api'
 import { useCartStore } from '../store/useCartStore'
-
-const NAV_CATEGORIES = [
-  { name: 'Watches', slug: 'watches', image: '/assets/images/categories/watches.jpg', link: '/collection?section=watches' },
-  { name: 'Sunglasses', slug: 'sunglasses', image: '/assets/images/categories/sunglasses.jpg', link: '/collection?section=accessories&category=sunglasses' },
-  { name: 'Bracelets', slug: 'bracelets', image: '/assets/images/categories/bracelets.jpg', link: '/collection?section=accessories&category=bracelets' },
-  { name: 'Rings', slug: 'rings', image: '/assets/images/categories/rings.jpg', link: '/collection?section=accessories&category=rings' },
-  { name: 'Chains', slug: 'chains', image: '/assets/images/categories/chains.jpg', link: '/collection?section=accessories&category=chains' },
-]
 
 export default function Home() {
   const addToCart = useCartStore((s) => s.addToCart)
 
+  const [navCategories, setNavCategories] = useState([])
   const [featuredPieces, setFeaturedPieces] = useState([])
   const [bestsellers, setBestsellers] = useState([])
   const [newArrivals, setNewArrivals] = useState([])
@@ -30,6 +23,7 @@ export default function Home() {
 
   useEffect(() => {
     Promise.all([
+      getCategories().then(setNavCategories).catch(console.error),
       getFeaturedPieces(6).then(setFeaturedPieces).catch(console.error),
       getBestsellers(6).then(setBestsellers).catch(console.error),
       getNewArrivals(8).then(setNewArrivals).catch(console.error),
@@ -111,18 +105,24 @@ export default function Home() {
           <p className="section-eyebrow text-center">Shop by Category</p>
           <h2 className="section-heading text-center">Find Your Piece</h2>
           <div className="category-orbits">
-            {NAV_CATEGORIES.map((cat) => (
-              <Link key={cat.slug} to={cat.link} className="category-orb">
-                <span className="category-orb-visual" style={{ position: 'relative', display: 'block', width: '180px', height: '180px' }}>
-                  <svg className="orb-arc orb-arc-1" viewBox="0 0 160 160" width="180" height="180" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', fill: 'none' }}>
+            {navCategories.map((cat) => {
+              // Build link based on section and slug
+              const link = cat.section === 'watches'
+                ? '/collection?section=watches'
+                : `/collection?section=accessories&category=${cat.slug}`
+              const image = cat.image_url || `/assets/images/categories/${cat.slug}.jpg`
+              return (
+              <Link key={cat.slug} to={link} className="category-orb">
+                <span className="category-orb-visual">
+                  <svg className="orb-arc orb-arc-1" viewBox="0 0 160 160" aria-hidden="true">
                     <path d="M 19.6 106.5 A 66 66 0 0 1 106.5 19.6" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
                   </svg>
-                  <svg className="orb-arc orb-arc-2" viewBox="0 0 160 160" width="160" height="160" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', fill: 'none' }}>
+                  <svg className="orb-arc orb-arc-2" viewBox="0 0 160 160" aria-hidden="true">
                     <path d="M 140.4 53.5 A 66 66 0 0 1 53.5 140.4" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                   <span className="category-orb-image" style={{ position: 'absolute', inset: '30px', borderRadius: '50%', overflow: 'hidden', display: 'block', background: '#ddd9d1' }}>
                     <img
-                      src={cat.image}
+                      src={image}
                       alt={cat.name}
                       onError={(e) => { e.currentTarget.src = '/assets/images/1.jpg' }}
                       loading="lazy"
@@ -132,7 +132,8 @@ export default function Home() {
                 </span>
                 <span className="category-orb-label">{cat.name}</span>
               </Link>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -152,7 +153,7 @@ export default function Home() {
             </div>
 
             <div className="featured-editorial" id="featuredCarousel">
-              <div className="featured-editorial-image" style={{ position: 'relative', minHeight: '480px', background: '#111' }}>
+              <div className="featured-editorial-image">
                 {featuredPieces.map((p, i) => {
                   const img = p.images?.[0]?.url || '/assets/images/1.jpg'
                   return (
