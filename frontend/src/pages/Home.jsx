@@ -105,11 +105,31 @@ export default function Home() {
           <p className="section-eyebrow text-center">Shop by Category</p>
           <h2 className="section-heading text-center">Find Your Piece</h2>
           <div className="category-orbits">
-            {navCategories.map((cat) => {
-              // Build link based on section and slug
-              const link = cat.section === 'watches'
-                ? '/collection?section=watches'
-                : `/collection?section=accessories&category=${cat.slug}`
+            
+            {/* Fixed Overall Watches Category */}
+            <Link to="/collection?section=watches" className="category-orb">
+              <span className="category-orb-visual">
+                <svg className="orb-arc orb-arc-1" viewBox="0 0 160 160" aria-hidden="true">
+                  <path d="M 19.6 106.5 A 66 66 0 0 1 106.5 19.6" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                <svg className="orb-arc orb-arc-2" viewBox="0 0 160 160" aria-hidden="true">
+                  <path d="M 140.4 53.5 A 66 66 0 0 1 53.5 140.4" fill="none" stroke="#a67c3d" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                <span className="category-orb-image" style={{ position: 'absolute', inset: '30px', borderRadius: '50%', overflow: 'hidden', display: 'block', background: '#ddd9d1' }}>
+                  <img
+                    src="/assets/images/1.jpg"
+                    alt="Watches"
+                    loading="lazy"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                </span>
+              </span>
+              <span className="category-orb-label">Watches</span>
+            </Link>
+
+            {/* Only Accessories Categories */}
+            {navCategories.filter(cat => cat.section !== 'watches').map((cat) => {
+              const link = `/collection?section=accessories&category=${cat.slug}`
               const image = cat.image_url || `/assets/images/categories/${cat.slug}.jpg`
               return (
               <Link key={cat.slug} to={link} className="category-orb">
