@@ -227,7 +227,7 @@ export default function Home() {
 
       {/* SECTION 3: BEST SELLERS (WHAT EVERYONE'S WEARING) */}
       {bestsellers.length > 0 && (
-        <section className="section reveal in-view">
+        <section id="best-sellers" className="section reveal in-view">
           <div className="container" style={{ maxWidth: '900px' }}>
             <p className="section-eyebrow">Best Sellers</p>
             <h2 className="section-heading">What Everyone's Wearing</h2>
