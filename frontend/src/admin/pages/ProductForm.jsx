@@ -29,6 +29,7 @@ export default function ProductForm() {
   const [variants, setVariants] = useState([])
   const [variantForm, setVariantForm] = useState({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true })
   const [editingVariant, setEditingVariant] = useState(null)
+  const [variantError, setVariantError] = useState('')
   const [pendingImages, setPendingImages] = useState([]) // files selected before product saved
 
   useEffect(() => {
@@ -135,19 +136,37 @@ export default function ProductForm() {
 
   const handleSaveVariant = async (e) => {
     e.preventDefault()
-    if (!productId) { alert('Save the product first before adding variants.'); return }
+    setVariantError('')
+    if (!productId) { setVariantError('Save the product first before adding variants.'); return }
     try {
-      const payload = { ...variantForm, product_id: productId, price_override: variantForm.price_override ? Number(variantForm.price_override) : null, stock: Number(variantForm.stock) }
+      let finalSku = variantForm.sku
+      if (!finalSku || finalSku.trim() === '') {
+        const safeName = variantForm.name.toLowerCase().replace(/[^a-z0-9]/gi, '-')
+        finalSku = `${form.sku || 'VAR'}-${safeName}-${Date.now().toString().slice(-4)}`
+      }
+      
+      const payload = { 
+        ...variantForm, 
+        sku: finalSku,
+        product_id: productId, 
+        price_override: variantForm.price_override ? Number(variantForm.price_override) : null, 
+        stock: Number(variantForm.stock) 
+      }
+      
       if (editingVariant) payload.id = editingVariant
       const saved = await adminSaveVariant(payload)
+      
       if (editingVariant) {
         setVariants(prev => prev.map(v => v.id === saved.id ? saved : v))
       } else {
         setVariants(prev => [...prev, saved])
       }
+      
       setVariantForm({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true })
       setEditingVariant(null)
-    } catch (e) { alert('Error: ' + e.message) }
+    } catch (e) { 
+      setVariantError(e.message || 'Failed to save variant. Check if SKU is unique.') 
+    }
   }
 
   const handleDeleteVariant = async (id) => {
@@ -383,7 +402,7 @@ export default function ProductForm() {
                       </div>
                       <div>
                         <label style={labelStyle}>SKU</label>
-                        <input value={variantForm.sku} onChange={e => setVariantForm(f => ({ ...f, sku: e.target.value }))} style={inputStyle} />
+                        <input value={variantForm.sku} onChange={e => setVariantForm(f => ({ ...f, sku: e.target.value }))} style={inputStyle} placeholder="Auto-generated if empty" />
                       </div>
                       <div>
                         <label style={labelStyle}>Price Override (Rs)</label>
@@ -400,6 +419,7 @@ export default function ProductForm() {
                         </label>
                       </div>
                     </div>
+                    {variantError && <div style={{ color: '#e05050', fontSize: '0.75rem', marginBottom: '0.75rem' }}>{variantError}</div>}
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button type="submit" style={{ background: 'var(--brass)', color: '#fff', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
                         {editingVariant ? 'Update Variant' : 'Add Variant'}
