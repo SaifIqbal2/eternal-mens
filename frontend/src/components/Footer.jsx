@@ -7,11 +7,10 @@ export default function Footer() {
       <div className="container footer-grid">
 
         <div className="footer-brand">
-          <div className="footer-logo-wrapper">
-            <span className="footer-logo-monogram">EM</span>
-            <span className="footer-logo-line"></span>
-            <span className="footer-logo-text">ETERNAL MENS</span>
-          </div>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.75rem', fontWeight: 700, color: 'var(--brass)', textDecoration: 'none', marginBottom: '1.25rem', fontFamily: 'var(--font-display)' }}>
+            <img src="/assets/images/logo.png" alt="Eternal Mens" style={{ height: '40px', width: 'auto', flexShrink: 0 }} />
+            <span>ETERNAL MENS</span>
+          </Link>
           <p className="footer-brand-desc">Timepieces and accessories built for the<br/>modern man.</p>
         </div>
 
