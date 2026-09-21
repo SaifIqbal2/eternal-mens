@@ -8,7 +8,21 @@ export default function Footer() {
 
         <div className="footer-brand">
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.75rem', fontWeight: 700, color: 'var(--brass)', textDecoration: 'none', marginBottom: '1.25rem', fontFamily: 'var(--font-display)' }}>
-            <img src="/assets/images/logo-brass.png" alt="Eternal Mens" style={{ height: '40px', width: 'auto', flexShrink: 0 }} />
+            <span style={{ 
+              display: 'inline-block',
+              width: '60px',
+              height: '40px',
+              backgroundColor: 'currentColor',
+              WebkitMaskImage: 'url(/assets/images/logo.png)',
+              WebkitMaskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center',
+              maskImage: 'url(/assets/images/logo.png)',
+              maskSize: 'contain',
+              maskRepeat: 'no-repeat',
+              maskPosition: 'center',
+              flexShrink: 0
+            }} />
             <span>ETERNAL MENS</span>
           </Link>
           <p className="footer-brand-desc">Timepieces and accessories built for the<br/>modern man.</p>
