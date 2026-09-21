@@ -326,9 +326,9 @@ export default function ProductForm() {
                               <td style={{ padding: '0.4rem 0.5rem' }}>{v.name}</td>
                               <td style={{ padding: '0.4rem 0.5rem', color: 'var(--admin-text-muted)', fontSize: '0.75rem' }}>{v.option_type}</td>
                               <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{v.sku}</td>
-                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : '—'}</td>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : '-'}</td>
                               <td style={{ padding: '0.4rem 0.5rem' }}>{v.stock}</td>
-                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? '✓' : '✗'}</td>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? 'Yes' : 'No'}</td>
                               <td style={{ padding: '0.4rem 0.5rem' }}>
                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                   <button type="button" onClick={() => startEditVariant(v)} style={{ background: 'none', border: 'none', color: 'var(--brass-soft)', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Edit</button>

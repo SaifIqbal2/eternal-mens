@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { adminGetProducts, adminUpdateStock, adminUpdateVariantStock } from '../../lib/api'
 
 export default function AdminInventory() {
@@ -57,8 +57,8 @@ export default function AdminInventory() {
         productId: p.id,
         variantId: null,
         productName: p.name,
-        variantName: 'â€”',
-        sku: p.sku || 'â€”',
+        variantName: '-',
+        sku: p.sku || '-',
         stock: p.stock || 0,
       })
     } else {
@@ -69,7 +69,7 @@ export default function AdminInventory() {
           variantId: v.id,
           productName: p.name,
           variantName: v.name,
-          sku: v.sku || 'â€”',
+          sku: v.sku || '-',
           stock: v.stock || 0,
         })
       })
