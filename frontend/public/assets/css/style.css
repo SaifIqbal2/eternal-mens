@@ -966,6 +966,7 @@ button { font-family: inherit; cursor: pointer; }
   .bestseller-rank { width: 36px; font-size: 1.5rem; }
   .bestseller-thumb { width: 50px; height: 64px; }
   .bestseller-add .btn-sm-add { padding: 0.45rem 0.7rem; font-size: 0.62rem; }
+  .bestseller-add-btn { display: none; }
 }
 
 
