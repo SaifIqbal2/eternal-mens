@@ -182,6 +182,26 @@ export async function placeOrder({ cart, form, discountCode = '', discountAmount
   const { error: itemsErr } = await supabase.from('order_items').insert(items)
   if (itemsErr) throw itemsErr
 
+  // 3. Increment discount usage count
+  if (discountCode) {
+    try {
+      const { data: discount } = await supabase
+        .from('discounts')
+        .select('id, times_used')
+        .eq('code', discountCode.toUpperCase())
+        .single()
+      
+      if (discount) {
+        await supabase
+          .from('discounts')
+          .update({ times_used: (discount.times_used || 0) + 1 })
+          .eq('id', discount.id)
+      }
+    } catch (e) {
+      console.error('Failed to update discount usage:', e)
+    }
+  }
+
   return order
 }
 
