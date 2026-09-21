@@ -172,7 +172,9 @@ export default function ProductDetails() {
               {/* Variants */}
               {product.variants?.filter(v => v.is_active).length > 0 && (
                 <div className="form-group" style={{ marginTop: '1.5rem' }}>
-                  <label>Color</label>
+                  <label style={{ textTransform: 'capitalize' }}>
+                    {product.variants[0]?.option_type || 'Variant'}
+                  </label>
                   <select
                     id="variantSelect"
                     onChange={e => {
