@@ -360,10 +360,10 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="new-arrivals-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
+              <div className="new-arrivals-footer">
                 <span className="mono">{String(arrivalsIndex + getArrivalsPerPage()).padStart(2, '0')}</span>
-                <span className="new-arrivals-progress" style={{ width: '120px', height: '2px', background: '#dcd8cf', position: 'relative', display: 'inline-block' }}>
-                  <i style={{ position: 'absolute', top: 0, left: 0, height: '100%', background: 'var(--brass)', width: `${(Math.min(newArrivals.length, arrivalsIndex + getArrivalsPerPage()) / Math.max(1, newArrivals.length)) * 100}%` }}></i>
+                <span className="new-arrivals-progress">
+                  <i style={{ width: `${(Math.min(newArrivals.length, arrivalsIndex + getArrivalsPerPage()) / Math.max(1, newArrivals.length)) * 100}%` }}></i>
                 </span>
                 <span className="mono">{String(newArrivals.length).padStart(2, '0')}</span>
               </div>
