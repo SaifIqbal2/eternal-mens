@@ -357,80 +357,132 @@ function ReviewForm({ productSlug, productId }) {
     const orderNum = fd.get('order_number')?.trim()
     const rating = fd.get('rating')
     const body = fd.get('body')?.trim()
+      const file = fd.get('review_image')
 
-    if (!name) errs.push('Please enter your name.')
-    if (!email) errs.push('Please enter your order email.')
-    if (!orderNum) errs.push('Please enter your order number.')
-    if (!rating) errs.push('Please select a rating.')
-    if (!body) errs.push('Please write a review.')
+      if (!name) errs.push('Please enter your name.')
+      if (!email) errs.push('Please enter your order email.')
+      if (!orderNum) errs.push('Please enter your order number.')
+      if (!rating) errs.push('Please select a rating.')
+      if (!body) errs.push('Please write a review.')
 
-    if (errs.length > 0) { setErrors(errs); return }
+      if (errs.length > 0) { setErrors(errs); return }
 
-    setSubmitting(true)
-    try {
-      // Note: Reviews require order verification via Supabase RPC or direct insert.
-      // We attempt insert — if RLS blocks it, show a helpful message.
-      const { supabase } = await import('../lib/supabase')
-      const { error } = await supabase.from('reviews').insert({
-        product_id: productId,
-        author_name: name,
-        rating: Number(rating),
-        body,
-        is_approved: false,
-      })
-      if (error) throw error
-      setMsg('Thanks! Your review was submitted and will appear after approval.')
-      e.target.reset()
-    } catch {
-      setMsg('Could not submit review. Please make sure you have a delivered order for this product, or contact us directly.')
-    } finally {
-      setSubmitting(false)
+      setSubmitting(true)
+      try {
+        const { supabase } = await import('../lib/supabase')
+        
+        // 1. Verify the order
+        const { data: validOrder } = await supabase
+          .from('orders')
+          .select('id, customer_id, items:order_items(product_id)')
+          .eq('order_number', orderNum.toUpperCase())
+          .eq('customer_email', email)
+          .single()
+
+        if (!validOrder || !validOrder.items.some(item => item.product_id === productId)) {
+          setMsg('We could not find an order matching these details for this product. Please double check your order number and email.')
+          setSubmitting(false)
+          return
+        }
+
+        // 2. Upload image if present
+        let media_url = null
+        let media_type = null
+        if (file && file.size > 0) {
+          const fileExt = file.name.split('.').pop()
+          const fileName = `reviews/${Math.random().toString(36).substring(2, 15)}.${fileExt}`
+          
+          const { error: uploadError } = await supabase.storage
+            .from('product-images')
+            .upload(fileName, file)
+            
+          if (!uploadError) {
+            const { data: publicData } = supabase.storage
+              .from('product-images')
+              .getPublicUrl(fileName)
+            media_url = publicData.publicUrl
+            media_type = 'IMAGE'
+          }
+        }
+
+        // 3. Insert review
+        const { error } = await supabase.from('reviews').insert({
+          product_id: productId,
+          order_id: validOrder.id,
+          customer_id: validOrder.customer_id,
+          author_name: name,
+          rating: Number(rating),
+          body,
+          media_url,
+          media_type,
+          is_approved: false,
+        })
+        
+        if (error) {
+          if (error.code === '23505') {
+            setMsg('You have already submitted a review for this product on this order.')
+          } else {
+            throw error
+          }
+        } else {
+          setMsg('Thanks! Your review was submitted and will appear after approval.')
+          e.target.reset()
+        }
+      } catch (err) {
+        console.error(err)
+        setMsg('Could not submit review. Please try again later.')
+      } finally {
+        setSubmitting(false)
+      }
     }
-  }
 
-  return (
-    <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
-      {errors.length > 0 && (
-        <div style={{ background: '#fbeaea', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '1rem 1.25rem', marginBottom: '1.25rem', fontSize: '0.9rem' }}>
-          {errors.map((e, i) => <p key={i}>{e}</p>)}
+    return (
+      <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+        {errors.length > 0 && (
+          <div style={{ background: '#fbeaea', border: '1px solid var(--danger)', color: 'var(--danger)', padding: '1rem 1.25rem', marginBottom: '1.25rem', fontSize: '0.9rem' }}>
+            {errors.map((e, i) => <p key={i}>{e}</p>)}
+          </div>
+        )}
+        {msg && (
+          <div style={{ background: '#eaf4ee', border: '1px solid var(--success)', color: 'var(--success)', padding: '1rem 1.25rem', marginBottom: '1.25rem', fontSize: '0.9rem' }}>
+            {msg}
+          </div>
+        )}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div className="form-group">
+            <label>Your Name</label>
+            <input type="text" name="author_name" required />
+          </div>
+          <div className="form-group">
+            <label>Order Number</label>
+            <input type="text" name="order_number" placeholder="e.g. ORD-1045" required />
+          </div>
         </div>
-      )}
-      {msg && (
-        <div style={{ background: '#eaf4ee', border: '1px solid var(--success)', color: 'var(--success)', padding: '1rem 1.25rem', marginBottom: '1.25rem', fontSize: '0.9rem' }}>
-          {msg}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <div className="form-group">
+            <label>Order Email</label>
+            <input type="email" name="email" placeholder="Email used at checkout" required />
+          </div>
+          <div className="form-group">
+            <label>Your Rating</label>
+            <select name="rating" required>
+              <option value="">Select a rating</option>
+              <option value="5">★★★★★ Excellent</option>
+              <option value="4">★★★★☆ Good</option>
+              <option value="3">★★★☆☆ Average</option>
+              <option value="2">★★☆☆☆ Below Average</option>
+              <option value="1">★☆☆☆☆ Poor</option>
+            </select>
+          </div>
         </div>
-      )}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
         <div className="form-group">
-          <label>Your Name</label>
-          <input type="text" name="author_name" required />
+          <label>Your Review</label>
+          <textarea name="body" rows="4" required></textarea>
         </div>
         <div className="form-group">
-          <label>Order Number</label>
-          <input type="text" name="order_number" placeholder="e.g. ORD-1045" required />
+          <label>Attach Photo (Optional)</label>
+          <input type="file" name="review_image" accept="image/*" style={{ padding: '0.5rem 0', background: 'transparent', border: 'none' }} />
         </div>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
-        <div className="form-group">
-          <label>Order Email</label>
-          <input type="email" name="email" placeholder="Email used at checkout" required />
-        </div>
-        <div className="form-group">
-          <label>Your Rating</label>
-          <select name="rating" required>
-            <option value="">Select a rating</option>
-            <option value="5">★★★★★ Excellent</option>
-            <option value="4">★★★★☆ Good</option>
-            <option value="3">★★★☆☆ Average</option>
-            <option value="2">★★☆☆☆ Below Average</option>
-            <option value="1">★☆☆☆☆ Poor</option>
-          </select>
-        </div>
-      </div>
-      <div className="form-group">
-        <label>Your Review</label>
-        <textarea name="body" rows="4" required></textarea>
-      </div>
       <button type="submit" className="btn btn-outline-dark" disabled={submitting}>
         {submitting ? 'Submitting...' : 'Submit Review'}
       </button>

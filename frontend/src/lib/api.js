@@ -134,10 +134,7 @@ export async function placeOrder({ cart, form, discountCode = '', discountAmount
   await supabase.from('customers').upsert({
     email: form.email,
     name: form.name,
-    phone: form.phone,
-    address: form.address,
-    city: form.city,
-    country: form.country || 'Pakistan'
+    phone: form.phone
   }, { onConflict: 'email' })
 
   // 2. Insert order
