@@ -298,95 +298,103 @@ export default function ProductForm() {
             </section>
 
             {/* Variants */}
-            {!isNew && (
-              <section style={sectionStyle}>
-                <h3 style={sectionTitle}>Variants (Color / Size / etc.)</h3>
+            <section style={sectionStyle}>
+              <h3 style={sectionTitle}>Variants (Color / Size / etc.)</h3>
 
-                {/* Existing variants table */}
-                {variants.length > 0 && (
-                  <div style={{ marginBottom: '1.25rem', overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
-                          {['Name', 'Type', 'SKU', 'Price Override', 'Stock', 'Active', ''].map(h => (
-                            <th key={h} style={{ padding: '0.4rem 0.5rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.65rem', textTransform: 'uppercase' }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {variants.map(v => (
-                          <tr key={v.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
-                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.name}</td>
-                            <td style={{ padding: '0.4rem 0.5rem', color: 'var(--admin-text-muted)', fontSize: '0.75rem' }}>{v.option_type}</td>
-                            <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{v.sku}</td>
-                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : 'â€”'}</td>
-                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.stock}</td>
-                            <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? 'âœ“' : 'âœ—'}</td>
-                            <td style={{ padding: '0.4rem 0.5rem' }}>
-                              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <button type="button" onClick={() => startEditVariant(v)} style={{ background: 'none', border: 'none', color: 'var(--brass-soft)', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Edit</button>
-                                <button type="button" onClick={() => handleDeleteVariant(v.id)} style={{ background: 'none', border: 'none', color: '#a83232', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Del</button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-
-                {/* Add/Edit variant form */}
-                <form onSubmit={handleSaveVariant} style={{ background: 'var(--admin-bg)', padding: '1rem', border: '1px solid var(--admin-border-strong)' }}>
-                  <p style={{ fontSize: '0.72rem', color: 'var(--brass-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
-                    {editingVariant ? 'Edit Variant' : 'Add New Variant'}
+              {isNew ? (
+                <div style={{ background: '#fff8e1', border: '1px solid #f59e0b', padding: '0.75rem 1rem', borderRadius: '4px' }}>
+                  <p style={{ color: '#92400e', fontSize: '0.82rem', margin: 0 }}>
+                    Save the product first (click "Create Product"), then you can add variants here.
                   </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                    <div>
-                      <label style={labelStyle}>Variant Name *</label>
-                      <input required value={variantForm.name} onChange={e => setVariantForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Black, Large" style={inputStyle} />
+                </div>
+              ) : (
+                <>
+                  {/* Existing variants table */}
+                  {variants.length > 0 && (
+                    <div style={{ marginBottom: '1.25rem', overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid var(--admin-border-strong)' }}>
+                            {['Name', 'Type', 'SKU', 'Price Override', 'Stock', 'Active', ''].map(h => (
+                              <th key={h} style={{ padding: '0.4rem 0.5rem', textAlign: 'left', color: 'var(--admin-text-muted)', fontWeight: 400, fontSize: '0.65rem', textTransform: 'uppercase' }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {variants.map(v => (
+                            <tr key={v.id} style={{ borderBottom: '1px solid var(--admin-border)' }}>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.name}</td>
+                              <td style={{ padding: '0.4rem 0.5rem', color: 'var(--admin-text-muted)', fontSize: '0.75rem' }}>{v.option_type}</td>
+                              <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--admin-text-muted)' }}>{v.sku}</td>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.price_override ? `Rs ${Number(v.price_override).toLocaleString()}` : '—'}</td>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.stock}</td>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>{v.is_active ? '✓' : '✗'}</td>
+                              <td style={{ padding: '0.4rem 0.5rem' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                  <button type="button" onClick={() => startEditVariant(v)} style={{ background: 'none', border: 'none', color: 'var(--brass-soft)', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Edit</button>
+                                  <button type="button" onClick={() => handleDeleteVariant(v.id)} style={{ background: 'none', border: 'none', color: '#a83232', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}>Del</button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                    <div>
-                      <label style={labelStyle}>Option Type</label>
-                      <select value={variantForm.option_type} onChange={e => setVariantForm(f => ({ ...f, option_type: e.target.value }))} style={inputStyle}>
-                        <option value="color">Color</option>
-                        <option value="size">Size</option>
-                        <option value="material">Material</option>
-                        <option value="style">Style</option>
-                        <option value="other">Other</option>
-                      </select>
+                  )}
+
+                  {/* Add/Edit variant form */}
+                  <form onSubmit={handleSaveVariant} style={{ background: 'var(--admin-bg)', padding: '1rem', border: '1px solid var(--admin-border-strong)' }}>
+                    <p style={{ fontSize: '0.72rem', color: 'var(--brass-soft)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
+                      {editingVariant ? 'Edit Variant' : 'Add New Variant'}
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                      <div>
+                        <label style={labelStyle}>Variant Name *</label>
+                        <input required value={variantForm.name} onChange={e => setVariantForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Black, Large" style={inputStyle} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Option Type</label>
+                        <select value={variantForm.option_type} onChange={e => setVariantForm(f => ({ ...f, option_type: e.target.value }))} style={inputStyle}>
+                          <option value="color">Color</option>
+                          <option value="size">Size</option>
+                          <option value="material">Material</option>
+                          <option value="style">Style</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>SKU</label>
+                        <input value={variantForm.sku} onChange={e => setVariantForm(f => ({ ...f, sku: e.target.value }))} style={inputStyle} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Price Override (Rs)</label>
+                        <input type="number" min="0" value={variantForm.price_override} onChange={e => setVariantForm(f => ({ ...f, price_override: e.target.value }))} style={inputStyle} placeholder="Leave blank to use product price" />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Stock</label>
+                        <input type="number" min="0" value={variantForm.stock} onChange={e => setVariantForm(f => ({ ...f, stock: e.target.value }))} style={inputStyle} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '0.2rem' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={variantForm.is_active} onChange={e => setVariantForm(f => ({ ...f, is_active: e.target.checked }))} />
+                          Active
+                        </label>
+                      </div>
                     </div>
-                    <div>
-                      <label style={labelStyle}>SKU</label>
-                      <input value={variantForm.sku} onChange={e => setVariantForm(f => ({ ...f, sku: e.target.value }))} style={inputStyle} />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Price Override (Rs)</label>
-                      <input type="number" min="0" value={variantForm.price_override} onChange={e => setVariantForm(f => ({ ...f, price_override: e.target.value }))} style={inputStyle} placeholder="Leave blank to use product price" />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Stock</label>
-                      <input type="number" min="0" value={variantForm.stock} onChange={e => setVariantForm(f => ({ ...f, stock: e.target.value }))} style={inputStyle} />
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '0.2rem' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--admin-text)', cursor: 'pointer' }}>
-                        <input type="checkbox" checked={variantForm.is_active} onChange={e => setVariantForm(f => ({ ...f, is_active: e.target.checked }))} />
-                        Active
-                      </label>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button type="submit" style={{ background: 'var(--brass)', color: 'var(--admin-text)', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
-                      {editingVariant ? 'Update Variant' : 'Add Variant'}
-                    </button>
-                    {editingVariant && (
-                      <button type="button" onClick={() => { setEditingVariant(null); setVariantForm({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true }) }} style={{ background: 'none', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-muted)', padding: '0.5rem 1rem', fontSize: '0.75rem', cursor: 'pointer' }}>
-                        Cancel
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button type="submit" style={{ background: 'var(--brass)', color: '#fff', border: 'none', padding: '0.5rem 1.25rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer' }}>
+                        {editingVariant ? 'Update Variant' : 'Add Variant'}
                       </button>
-                    )}
-                  </div>
-                </form>
-              </section>
-            )}
+                      {editingVariant && (
+                        <button type="button" onClick={() => { setEditingVariant(null); setVariantForm({ name: '', option_type: 'color', sku: '', price_override: '', stock: 0, is_active: true }) }} style={{ background: 'none', border: '1px solid var(--admin-border-strong)', color: 'var(--admin-text-muted)', padding: '0.5rem 1rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                </>
+              )}
+            </section>
           </div>
         </div>
 
